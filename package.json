@@ -1,0 +1,13 @@
+{
+  "name": "microhex-js",
+  "version": "0.0.1",
+  "main": "app.js",
+  "devDependencies": {
+    "nconf": "^0.7.1",
+    "nodeunit": "^0.9.1",
+    "string": "^3.1.3"
+  },
+  "dependencies": {
+    "lodash": "^3.9.3"
+  }
+}

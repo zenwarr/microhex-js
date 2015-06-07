@@ -1,0 +1,52 @@
+body {
+  margin: 0;
+}
+
+.column {
+  display: inline-block;
+  vertical-align: top;
+  padding: 10px;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+
+  font-family: 'Ubuntu Mono', monospace;
+  font-size: 16px;
+  line-height: 20px;
+
+  color: gray;
+
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.column:first-child {
+  border-left: 0;
+}
+
+::selection {
+  background: lightgreen;
+  color: white;
+}
+
+.cell {
+  display: inline-block;
+  position: relative;
+  margin-right: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.cell.active {
+  background: lightgreen;
+  color: white;
+  border: 1px solid green;
+}
+
+.cell:last-child {
+  margin-right: 0;
+}
+
+.query {
+  display: block;
+  margin-bottom: 10px;
+}

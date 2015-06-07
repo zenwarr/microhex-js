@@ -1,0 +1,23 @@
+{
+  "name": "microhex-js",
+  "version": "0.0.0",
+  "authors": [
+    "zenwarr <zenw@yandex.ru>"
+  ],
+  "main": "app.js",
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "~0.13.3",
+    "zepto": "~1.1.6"
+  }
+}
