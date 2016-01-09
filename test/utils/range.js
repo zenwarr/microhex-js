@@ -1,12 +1,12 @@
-var Range = require('../range').Range;
+var Range = require('../../utils/range').Range;
 
 module.exports = {
   'testRangeBasic': function(t) {
     var range = new Range(100, 200);
 
-    t.equal(range.start(), 100);
-    t.equal(range.length(), 200);
-    t.equal(range.last(), 299);
+    t.equal(range.start, 100);
+    t.equal(range.length, 200);
+    t.equal(range.last, 299);
 
     t.ok(range.isByteInside(100));
     t.ok(range.isByteInside(299));
@@ -28,18 +28,18 @@ module.exports = {
   }, 'testZeroRange': function(t) {
     var range = new Range(0, 0);
 
-    t.equal(range.length(), 0);
-    t.equal(range.start(), 0);
-    t.equal(range.last(), 0);
+    t.equal(range.length, 0);
+    t.equal(range.start, 0);
+    t.equal(range.last, 0);
     t.equal(range.getInsideSize(0, 100), 0);
 
     t.done();
   }, 'testZeroRange2': function(t) {
     var range = new Range(10, 0);
 
-    t.equal(range.start(), 10);
-    t.equal(range.length(), 0);
-    t.equal(range.last(), 10);
+    t.equal(range.start, 10);
+    t.equal(range.length, 0);
+    t.equal(range.last, 10);
     t.equal(range.getInsideSize(10, 10), 0);
     t.equal(range.getInsideSize(10, 0), 0);
 

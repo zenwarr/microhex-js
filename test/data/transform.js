@@ -1,4 +1,4 @@
-var transform = require('../transform');
+var transform = require('../../data/transform');
 
 module.exports = {
   hex: {
@@ -11,7 +11,10 @@ module.exports = {
     decode: function(t) {
       var state = {};
 
+      // size of piece for hex transformation is 1
       t.equal(this.transform.sizeFunc(this.buf, 0, 12, state), 1);
+
+      // should correctly decode first byte in buffer
       t.deepEqual(this.transform.decodeFunc(this.buf, 0, 12, state), [null, '48']);
 
       t.done();
@@ -20,7 +23,18 @@ module.exports = {
     decodeOffset: function(t) {
       var state = {};
 
+      // should correctly decode byte in middle of buffer
       t.deepEqual(this.transform.decodeFunc(this.buf, 1, 5, state), [null, '65']);
+
+      t.done();
+    },
+
+    decodeIncorrectOffset: function(t) {
+      var state = {};
+
+      t.throws(function() {
+        this.transform.decodeFunc(this.buf, 100, 100, state);
+      });
 
       t.done();
     },

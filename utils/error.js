@@ -10,21 +10,21 @@ var error_codes = [
   'Error while decoding data'
 ];
 
-function nError(code, text, cause) {
-  Error.apply(this, [text == undefined ? error_codes[code] : text]);
-  this.code = code;
-  this.cause = cause;
-}
-
-nError.prototype.__proto__ = Error.prototype;
-
-nError.prototype.detailed = function() {
-  var text = this.text;
-  if (this.cause != undefined) {
-    text = text + ' caused by [' + this.cause.detailed + ']';
+class nError extends Error {
+  constructor(code, text, cause) {
+    super(text == undefined ? error_codes[code] : text);
+    this.code = code;
+    this.cause = cause;
   }
-  return text;
-};
+
+  detailed() {
+    var text = this.text;
+    if (this.cause != undefined) {
+      text = text + ' caused by [' + this.cause.detailed + ']';
+    }
+    return text;
+  }
+}
 
 module.exports = {
   make: function(code, text, cause) {

@@ -1,5 +1,5 @@
-function AbstractSpan {
-  this.size = 0;
+class AbstractSpan {
+  constructor() {
+    this.length = 0;
+  }
 }
-
-AbstractSpan.prototype.

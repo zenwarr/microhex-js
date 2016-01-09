@@ -1,7 +1,7 @@
 var app = require('app');
 var BrowserWindow = require('browser-window');
 var Menu = require('menu');
-var ipc = require('ipc');
+var electron = require('electron');
 var crypto = require('crypto');
 var dialog = require('dialog');
 
@@ -9,6 +9,7 @@ var ds = require('./data/source');
 var DataCursor = require('./data/cursor').DataCursor;
 var transform = require('./data/transform');
 
+const ipcMain = electron.ipcMain;
 var mainWindow = null;
 
 var source;
@@ -19,7 +20,7 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({
     title: 'Microhex'
   });
-  mainWindow.loadUrl('file://' + __dirname + '/index.html');
+  mainWindow.loadURL('file://' + __dirname + '/index.html');
   mainWindow.openDevTools();
 
   mainWindow.on('closed', function() {
@@ -52,7 +53,7 @@ function build_menus() {
   Menu.setApplicationMenu(menu);
 }
 
-ipc.on('data-query', function(event, arg) {
+ipcMain.on('data-query', function(event, arg) {
   var cursor = new DataCursor(source, 0, new transform.TransformToHex());
   var data = [];
 

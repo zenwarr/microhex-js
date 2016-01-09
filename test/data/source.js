@@ -1,4 +1,4 @@
-var ds = require('../source');
+var ds = require('../../data/source');
 var error = require('../../utils/error');
 var crypto = require('crypto');
 var os = require('os');
@@ -8,15 +8,15 @@ var fs = require('fs');
 module.exports = {
   testBufferDataSource: function(t) {
     ds.createBufferDS('Hello, World', {}, function(err, bs) {
-      t.equal(bs.isWriteable(), true);
-      t.equal(bs.isResizeable(), false);
-      t.equal(bs.length(), 12);
+      t.equal(bs.isWriteable, true);
+      t.equal(bs.isResizeable, false);
+      t.equal(bs.length, 12);
 
-      var outbuf = new Buffer(bs.length());
+      var outbuf = new Buffer(bs.length);
       outbuf.fill(0);
-      bs.read(0, bs.length(), function(err, real_read, buffer) {
+      bs.read(0, bs.length, function(err, real_read, buffer) {
         t.ok(!err);
-        t.equal(real_read, bs.length());
+        t.equal(real_read, bs.length);
         t.ok(outbuf === buffer);
         t.equal(outbuf.compare(new Buffer('Hello, World')), 0);
       }, outbuf, 0);
@@ -29,9 +29,9 @@ module.exports = {
     ds.createBufferDS('Hello, World', {
       writeable: false
     }, function(err, bs) {
-      t.equal(bs.isWriteable(), false);
-      t.equal(bs.isResizeable(), false);
-      t.equal(bs.length(), 12);
+      t.equal(bs.isWriteable, false);
+      t.equal(bs.isResizeable, false);
+      t.equal(bs.length, 12);
 
       t.done();
     });
@@ -104,7 +104,7 @@ module.exports = {
       var self = this;
       this.bs.write('Fuck', 0, function(err) {
         t.ok(!err);
-        self.bs.read(0, self.bs.length(), function(err, real, buf) {
+        self.bs.read(0, self.bs.length, function(err, real, buf) {
           t.equal(buf.toString(), 'Fucko, World');
         });
       });
@@ -117,7 +117,7 @@ module.exports = {
 
       this.bs.write('Fuck', 7, function(err) {
         t.ok(!err);
-        self.bs.read(0, self.bs.length(), function(err, real, buf) {
+        self.bs.read(0, self.bs.length, function(err, real, buf) {
           t.equal(buf.toString(), 'Hello, Fuckd');
         });
       });
@@ -128,9 +128,9 @@ module.exports = {
     writePartiallyOutOfBounds: function(t) {
       var self = this;
 
-      this.bs.write('Fuck', this.bs.length() - 2, function(err) {
+      this.bs.write('Fuck', this.bs.length - 2, function(err) {
         t.ok(err);
-        self.bs.read(0, self.bs.length(), function(err, real, buf) {
+        self.bs.read(0, self.bs.length, function(err, real, buf) {
           t.equal(buf.toString(), 'Hello, World');
         });
       });
@@ -143,7 +143,7 @@ module.exports = {
 
       this.bs.write('Fuck', 100, function(err) {
         t.ok(err);
-        self.bs.read(0, self.bs.length(), function(err, real, buf) {
+        self.bs.read(0, self.bs.length, function(err, real, buf) {
           t.equal(buf.toString(), 'Hello, World');
         });
       });
@@ -158,7 +158,7 @@ module.exports = {
         t.ok(!err);
         t.ok(buffer != undefined);
         t.equal(buffer_offset, 0);
-        t.equal(avail, self.bs.length());
+        t.equal(avail, self.bs.length);
         t.equal(buffer.slice(buffer_offset, avail + buffer_offset).toString(), 'Hello, World');
       });
 
@@ -184,7 +184,7 @@ module.exports = {
         writeable: false
       }, function(err, bs) {
         t.ok(bs != undefined);
-        t.ok(!bs.isWriteable());
+        t.ok(!bs.isWriteable);
         bs.read(0, 100, function(err, real_read, buffer) {
           t.ok(!err);
           t.equal(real_read, 12);
@@ -210,8 +210,8 @@ module.exports = {
         t.ok(!err);
         t.ok(s);
 
-        t.ok(s.ok());
-        t.equal(s.length(), 0);
+        t.ok(s.ok);
+        t.equal(s.length, 0);
 
         t.done();
       });
@@ -234,10 +234,10 @@ module.exports = {
       readAll: function(t) {
         t.ok(!this.err);
         t.ok(this.s);
-        t.ok(this.s.ok());
+        t.ok(this.s.ok);
 
-        t.equal(this.s.length(), 12);
-        this.s.read(0, this.s.length(), function(err, bytes_read, buffer) {
+        t.equal(this.s.length, 12);
+        this.s.read(0, this.s.length, function(err, bytes_read, buffer) {
           t.ok(!err);
           t.equal(bytes_read, 12);
           t.equal(buffer.toString(), 'Hello, World');
@@ -260,9 +260,9 @@ module.exports = {
         var self = this;
         this.s.write('Fuck', 7, function(err) {
           t.ok(!err);
-          t.ok(self.s.length(), 12);
+          t.ok(self.s.length, 12);
 
-          self.s.read(0, self.s.length(), function(err, bytes_read, buffer) {
+          self.s.read(0, self.s.length, function(err, bytes_read, buffer) {
             t.ok(!err);
             t.equal(bytes_read, 12);
             t.equal(buffer.toString(), 'Hello, Fuckd');
@@ -279,7 +279,7 @@ module.exports = {
           t.ok(!err);
           t.ok(buffer != undefined);
           t.equal(buffer_offset, 0);
-          t.equal(avail, self.s.length());
+          t.equal(avail, self.s.length);
           t.equal(buffer.slice(buffer_offset, avail + buffer_offset).toString(), 'Hello, World');
         });
 

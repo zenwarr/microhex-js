@@ -28,6 +28,10 @@ body {
   color: white;
 }
 
+.row {
+  white-space: nowrap;
+}
+
 .cell {
   display: inline-block;
   position: relative;

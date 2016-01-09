@@ -1,9 +1,11 @@
 "use strict";
 
-var ipc = require('ipc');
+var electron = require('electron');
+
+const ipcRenderer = electron.ipcRenderer;
 
 $(function() {
-  ipc.on('data-reply', function(data) {
+  ipcRenderer.on('data-reply', function(event, data) {
     var $column = $('.column');
     $column.html('');
 
@@ -32,11 +34,11 @@ $(function() {
     });
   });
 
-  ipc.on('src-avail', function(data) {
+  ipcRenderer.on('src-avail', function(data) {
     update_data();
   });
 
   function update_data() {
-    ipc.send('data-query');
+    ipcRenderer.send('data-query');
   }
 });
