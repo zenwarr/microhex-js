@@ -15,11 +15,19 @@ commands:
     bower install
 
 Now application is ready to start. Run it:
+
     electron .
 
 In order to run tests you should install nodeunit with the following command:
+
     npm install -g nodeunit
+
 All test are located in 'test' directory. You can run only single test package with command (example)
+
     nodeunit test/utils
+
 or all tests in once:
+
     node test/all.js
+
+
