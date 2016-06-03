@@ -4,6 +4,7 @@ import * as crypto from 'crypto';
 import * as path from 'path';
 import * as fs from 'fs';
 import { FillDataSource, BufferDataSource, AbstractDataSource, FileDataSource } from '../../data/source';
+import { ErrorClass } from '../../utils/error';
 
 describe('FillDataSource', function() {
   let source:FillDataSource;
@@ -20,6 +21,10 @@ describe('FillDataSource', function() {
     source.read(4, 3).on('data', (d:Buffer) => {
       expect(d.equals(Buffer.alloc(3, 0))).to.be.true;
     }).on('end', () => done()).on('error', () => expect.fail());
+  });
+
+  it('should throw when length is unsafe', function() {
+    expect(() => new FillDataSource(Number.MAX_SAFE_INTEGER + 1)).throws(ErrorClass.InvalidArguments);
   });
 });
 

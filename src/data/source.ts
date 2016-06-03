@@ -29,6 +29,10 @@ export class FillDataSource extends AbstractDataSource {
   constructor(protected _fill_size:number, protected _fill_byte?:number) {
     super(AbstractDataSource.generateSourceUrl('fill'));
 
+    if (_fill_size > Number.MAX_SAFE_INTEGER) {
+      throw new ErrorClass.InvalidArguments();
+    }
+
     if (this._fill_byte == null) {
       this._fill_byte = 0;
     }
