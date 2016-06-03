@@ -7,10 +7,12 @@
   "files": [
     "./src/app.ts",
     "./src/data/chain.ts",
+    "./src/data/document.ts",
     "./src/data/source.ts",
     "./src/data/spans.ts",
     "./src/data/stream.ts",
     "./src/test/data/chain.ts",
+    "./src/test/data/document.ts",
     "./src/test/data/source.ts",
     "./src/test/data/spans.ts",
     "./src/test/data/stream.ts",
