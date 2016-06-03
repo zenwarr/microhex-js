@@ -1,4 +1,10 @@
 .idea
-
-bower_components
+client
 node_modules
+build
+typings
+todo.md
+src/**/*.js
+src/**/*.js.map
+client_src/**/*.js
+client_src/**/*.js.map

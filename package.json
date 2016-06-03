@@ -1,13 +1,33 @@
 {
   "name": "microhex-js",
   "version": "0.0.1",
-  "main": "app.js",
+  "main": "./build/app.js",
   "devDependencies": {
-    "nconf": "^0.7.1",
-    "nodeunit": "^0.9.1",
-    "string": "^3.1.3"
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-stylus": "^2.3.1",
+    "gulp-typescript": "^2.13.0",
+    "gulp-watch": "^4.3.5",
+    "mocha": "^2.5.3",
+    "node-inspector": "^0.12.8",
+    "stylus": "^0.54.2",
+    "ts-loader": "^0.8.2",
+    "typescript": "^1.8.10",
+    "typings": "^1.0.0",
+    "webpack": "^1.13.0",
+    "webpack-stream": "^3.1.0",
+    "webpack-target-electron-renderer": "^0.4.0"
   },
   "dependencies": {
-    "lodash": "^3.9.3"
+    "electron-prebuilt": "^1.1.0",
+    "lodash": "^4.12.0"
+  },
+  "scripts": {
+    "build": "typings install && gulp",
+    "build-dev": "gulp default:dev",
+    "start": "electron .",
+    "build-tests": "webpack --config ./webpack/tests.config.js",
+    "test": "mocha ./build/test/ --recursive",
+    "build-and-test": "npm run build-tests && npm test"
   }
 }

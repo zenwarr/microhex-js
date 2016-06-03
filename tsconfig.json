@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": true
+  },
+  "files": [
+    "./src/app.ts",
+    "./src/data/source.ts",
+    "./src/data/spans.ts",
+    "./src/data/stream.ts",
+    "./src/test/data/source.ts",
+    "./src/test/data/spans.ts",
+    "./src/test/data/stream.ts",
+    "./src/test/utils/range.ts",
+    "./src/utils/error.ts",
+    "./src/utils/range.ts",
+    "./client_src/js/client.ts",
+    "./typings/index.d.ts"
+  ],
+  "filesGlob": [
+    "./src/**/*.ts",
+    "./client_src/**/*.ts",
+    "./typings/index.d.ts"
+  ],
+  "compileOnSave": true,
+  "atom": {
+    "rewriteTsconfig": true
+  }
+}
