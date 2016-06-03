@@ -2,7 +2,7 @@ import { Readable } from 'stream';
 import { ErrorClass } from '../utils/error';
 import { Range, QRange } from '../utils/range';
 import { DataReadStream, AbstractReadable } from './stream';
-import { AbstractDataSource } from './source';
+import { AbstractDataSource, FillDataSource, BufferDataSource } from './source';
 
 /**
  * Span is minimal piece of constant binary data microhex operates on. Depending on implementation,
@@ -47,19 +47,19 @@ export class SourceSpan extends AbstractSpan {
       throw new ErrorClass.InvalidArguments();
     }
 
-    if (source_offset == null) {
-      source_offset = 0;
+    if (this.source_offset == null) {
+      this.source_offset = 0;
     }
 
     let source_range = new QRange(source.length),
-        span_range = new Range(source_offset, source_length);
+        span_range = new Range(this.source_offset, this.source_length);
 
     if (!span_range.valid) {
       throw new ErrorClass.InvalidArguments();
     }
 
-    if (source_length == null) {
-      source_length = source_range.itemsFrom(source_offset);
+    if (this.source_length == null) {
+      this.source_length = source_range.itemsFrom(this.source_offset);
     }
 
     if (!source_range.containsRange(span_range)) {
@@ -100,5 +100,17 @@ export class SourceSpan extends AbstractSpan {
       return [new SourceSpan(this.source, this.source_offset, offset),
               new SourceSpan(this.source, this.source_offset + offset, span_range.itemsFrom(offset))];
     }
+  }
+}
+
+export class FillSpan extends SourceSpan {
+  constructor(fill_size:number, fill_byte?:number) {
+    super(new FillDataSource(fill_size, fill_byte));
+  }
+}
+
+export class BufferSpan extends SourceSpan {
+  constructor(buf:Buffer) {
+    super(new BufferDataSource(buf));
   }
 }

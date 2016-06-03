@@ -1,4 +1,4 @@
-import { AbstractSpan, SourceSpan } from '../../data/spans';
+import { AbstractSpan, SourceSpan, FillSpan } from '../../data/spans';
 import { BufferDataSource } from '../../data/source';
 import { DataReadStream } from '../../data/stream';
 import { ErrorClass } from '../../utils/error';
@@ -16,6 +16,13 @@ class BufferDataSource_Inh extends BufferDataSource {
 }
 
 describe('SourceSpan', function() {
+  it('should have correct length', function() {
+    let source = new BufferDataSource(new Buffer('0123456789'));
+    let span = new SourceSpan(source, 2, 6);
+
+    expect(span.length).to.equal(6);
+  });
+
   it('should correctly read from source', function(done:MochaDone) {
     let source = new BufferDataSource_Inh(new Buffer('0123456789'), function(offset:number, size:number):void {
       expect(offset).to.equal(4);
@@ -69,51 +76,3 @@ describe('SourceSpan', function() {
     })
   });
 });
-
-// export let exp = {
-//   'reading': function(t:Test) {
-//     let source = new BufferDataSource(new Buffer('abcdefgh'));
-//
-//     let span = new SourceSpan(source, 2, 4);
-//
-//     let stream = span.readAll();
-//
-//     setTimeout(function() {
-//       stream.on('data', (d:Buffer) => t.ok(d.equals(new Buffer('cdef'))));
-//     }, 0);
-//
-//     t.done();
-//   }, 'splitting': function(t:Test) {
-//     let source = new BufferDataSource(new Buffer('abcdefgh'));
-//
-//     let span = new SourceSpan(source, 2, 5);
-//
-//     let f:SourceSpan, l:SourceSpan;
-//     [f, l] = span.split(2) as SourceSpan[];
-//
-//     t.equal(f.source_offset, 2);
-//     t.equal(f.source_length, 2);
-//     t.equal(f.length, 2);
-//
-//     t.equal(l.source_offset, 4);
-//     t.equal(l.source_length, 3);
-//     t.equal(l.source_length, 3);
-//
-//     [f, l] = span.split(0) as SourceSpan[];
-//     t.equal(f, null);
-//     t.equal(l.source_offset, 2);
-//     t.equal(l.source_length, 5);
-//     t.equal(l.length, 5);
-//
-//     [f, l] = span.split(4) as SourceSpan[];
-//     t.equal(f.source_offset, 2);
-//     t.equal(f.source_length, 5);
-//     t.equal(f.length, 5);
-//     t.equal(l, null);
-//
-//     t.throws(() => span.split(-1), ErrorClass.AccessRange);
-//     t.throws(() => span.split(5), ErrorClass.AccessRange);
-//
-//     t.done();
-//   }
-// }

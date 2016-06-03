@@ -37,17 +37,20 @@ export enum ErrorCode {
   NotImplemented,
   InvalidArguments,
   AccessRange,
-  IO
+  IO,
+  ObjectInconsistence
 }
 
 export const ErrorDescription:Array<string> = [
   'Method is not implemented',
   'Invalid function or method arguments',
   'Attempt to access data outside valid range',
-  'I/O error'
+  'I/O error',
+  'Object is in inconsistent state'
 ];
 
 add_error_class('InvalidArguments', ErrorCode.InvalidArguments);
 add_error_class('NotImplemented', ErrorCode.NotImplemented);
 add_error_class('AccessRange', ErrorCode.AccessRange);
 add_error_class('IO', ErrorCode.IO);
+add_error_class('ObjectInconsistence', ErrorCode.ObjectInconsistence);

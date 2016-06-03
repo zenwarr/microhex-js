@@ -113,6 +113,10 @@ describe('Range', function() {
     it('should reject invalid range', function() {
       expect(r.containsRange(new Range(-10, 5))).to.be.false;
     });
+
+    it('should contain itself', function() {
+      expect(r.containsRange(new Range(100, 200))).to.be.true;
+    });
   });
 
   describe('getInsideSize', function() {
