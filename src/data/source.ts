@@ -4,7 +4,7 @@ import { ErrorClass } from '../utils/error';
 import { Range, QRange } from '../utils/range';
 import { DataReadStream, AbstractReadable } from './stream';
 
-export class AbstractDataSource extends AbstractReadable {
+export abstract class AbstractDataSource extends AbstractReadable {
   constructor(protected _url:string) {
     super();
   }

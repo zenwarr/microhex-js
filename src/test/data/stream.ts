@@ -10,6 +10,10 @@ class ReadableMock extends AbstractReadable {
   }
 
   get length():number { return this._len; }
+
+  _do_readToStream(stream:DataReadStream, offset:number, size:number):void {
+    throw ErrorClass.NotImplementedError();
+  }
 }
 
 describe('DataReadStream', function() {
@@ -20,10 +24,12 @@ describe('DataReadStream', function() {
     stream_mock = new DataReadStream(readable_mock, 3, 5);
   });
 
-  it('should call _do_readToStream', function() {
+  it('should call _do_readToStream', function(done:MochaDone) {
     stream_mock._do_readToStream = function(offset:number, size:number):void {
       expect(offset).to.be.equal(3);
       expect(size).to.be.equal(5);
+      
+      done();
     }
 
     stream_mock._read();
@@ -37,19 +43,23 @@ describe('AbstractReadable', function() {
     readable_mock = new ReadableMock(10);
   });
 
-  it('should call readable._do_readToStream with correct arguments', function() {
+  it('should call readable._do_readToStream with correct arguments', function(done:MochaDone) {
     readable_mock._do_readToStream = function(stream:DataReadStream, offset:number, size:number) {
       expect(offset).to.be.equal(3);
       expect(size).to.be.equal(5);
+
+      done();
     }
 
     readable_mock.read(3, 5).read();
   });
 
-  it('readAll should read all', function() {
+  it('readAll should read all', function(done:MochaDone) {
     readable_mock._do_readToStream = function(stream:DataReadStream, offset:number, size:number) {
       expect(offset).to.be.equal(0);
       expect(size).to.be.equal(10);
+
+      done();
     }
 
     readable_mock.readAll().read();

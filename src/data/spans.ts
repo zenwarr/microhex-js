@@ -9,7 +9,7 @@ import { AbstractDataSource, FillDataSource, BufferDataSource } from './source';
  * there are different ways for span to hold data, but every span should report its length and
  * provide mechanism to read any sequence of bytes inside itself and support splitting.
  */
-export class AbstractSpan extends AbstractReadable {
+export abstract class AbstractSpan extends AbstractReadable {
   constructor() {
     super();
   }
@@ -30,9 +30,7 @@ export class AbstractSpan extends AbstractReadable {
   /**
    * Implement custom span splitting logic here. Assume that \p offset is valid.
    */
-  protected _do_split(offset:number):AbstractSpan[] {
-    throw new ErrorClass.NotImplemented();
-  }
+  protected abstract _do_split(offset:number):AbstractSpan[];
 }
 
 /**

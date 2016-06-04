@@ -63,7 +63,7 @@ export class DataReadStream extends Readable {
 /**
  * Represents abstract object which manages particular amount of readable binary data.
  */
-export class AbstractReadable {
+export abstract class AbstractReadable {
   /**
    * Returns number of bytes in this readable.
    */
@@ -145,7 +145,5 @@ export class AbstractReadable {
    * This function is called by node stream implementation multiple times until the end of
    * stream will be reached. \p cur_offset and \p size arguments should be considered as valid.
    */
-  _do_readToStream(stream:DataReadStream, cur_offset:number, read_size:number):void {
-    throw new ErrorClass.NotImplemented();
-  }
+  abstract _do_readToStream(stream:DataReadStream, cur_offset:number, read_size:number):void;
 }
