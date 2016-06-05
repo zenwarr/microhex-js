@@ -17,7 +17,7 @@
     "./src/test/data/spans.ts",
     "./src/test/data/stream.ts",
     "./src/test/utils/range.ts",
-    "./src/utils/error.ts",
+    "./src/utils/errors.ts",
     "./src/utils/range.ts",
     "./client_src/js/client.ts",
     "./typings/index.d.ts"

@@ -20,7 +20,7 @@ function process_dir(dir_name) {
       process_dir(relpath);
     } else {
       var extname = path.extname(relpath);
-      if (extname == '.ts') {
+      if (extname == '.ts' && path.basename(relpath).charAt(0) != '_') {
         var entry_name = relpath.slice(0, -extname.length);
         entries['test/' + entry_name.slice(base_dir.length)] = './' + relpath;
       }

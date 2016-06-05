@@ -1,7 +1,7 @@
-import { AbstractSpan, SourceSpan, FillSpan } from '../../data/spans';
+import { SourceSpan } from '../../data/spans';
 import { BufferDataSource } from '../../data/source';
 import { DataReadStream } from '../../data/stream';
-import { ErrorClass } from '../../utils/error';
+import * as Errors from '../../utils/errors';
 import { expect } from 'chai';
 
 class BufferDataSource_Inh extends BufferDataSource {
@@ -71,8 +71,8 @@ describe('SourceSpan', function() {
     });
 
     it('should throw when splitting on incorrect position', function() {
-      expect(() => span.split(-1)).to.throw(ErrorClass.AccessRange);
-      expect(() => span.split(6)).to.throw(ErrorClass.AccessRange);
+      expect(() => span.split(-1)).to.throw(Errors.AccessRange);
+      expect(() => span.split(6)).to.throw(Errors.AccessRange);
     })
   });
 });

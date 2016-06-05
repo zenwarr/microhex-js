@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { Document } from '../../data/document';
 import { AbstractDataSource, BufferDataSource } from '../../data/source';
+import { check_read } from './_common';
 
 describe('Document', function() {
   let doc:Document, source:AbstractDataSource;
@@ -38,9 +39,7 @@ describe('Document', function() {
 
   describe('reading', function() {
     it('should correctly read from source', function(done:MochaDone) {
-      doc.read(2, 4).on('data', (d:Buffer) => {
-        expect(d.equals(new Buffer('2345'))).to.be.true;
-      }).on('end', done).on('error', (err:Error) => expect.fail(err));
+      check_read(doc, 2, 4, new Buffer('2345'), done);
     });
   });
 });

@@ -1,4 +1,5 @@
-import { DataReadStream, AbstractReadable } from './stream';
+import { isNullOrUndefined } from '../utils/utils';
+import { AbstractReadable } from './stream';
 import { AbstractDataSource } from './source';
 import { AbstractSpan, SourceSpan } from './spans';
 import { Chain } from './chain';
@@ -6,10 +7,10 @@ import { Chain } from './chain';
 export class Document extends AbstractReadable {
   protected _chain:Chain;
 
-  constructor(protected _source:AbstractDataSource = null) {
+  constructor(protected _source?:AbstractDataSource = null) {
     super();
 
-    if (this._source != null) {
+    if (!isNullOrUndefined(this._source)) {
       let source_span:SourceSpan = new SourceSpan(this._source);
       this._chain = new Chain([source_span]);
     } else {
@@ -21,8 +22,8 @@ export class Document extends AbstractReadable {
 
   get source():AbstractDataSource { return this._source; }
 
-  _do_readToStream(stream:DataReadStream, cur_offset:number, read_size:number):void {
-    this._chain._do_readToStream(stream, cur_offset, read_size);
+  _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer> {
+    return this._chain._do_readToStream(cur_offset, read_size);
   }
 
   insertSpan(span:AbstractSpan, position:number):void {

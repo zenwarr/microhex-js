@@ -1,9 +1,8 @@
 import { AbstractSpan } from './spans';
-import { ErrorClass } from '../utils/error';
+import * as Errors from '../utils/errors';
+import { isNullOrUndefined } from '../utils/utils';
 import { Range, QRange } from '../utils/range';
-import { DataReadStream, AbstractReadable } from '../data/stream';
-
-import * as async from 'async';
+import { AbstractReadable } from '../data/stream';
 
 export class ChainPositionData {
   public span_index:number;
@@ -33,8 +32,8 @@ export class Chain extends AbstractReadable {
    * Appends span at the end of chain.
    */
   pushSpan(span:AbstractSpan):void {
-    if (span == null) {
-      throw new ErrorClass.InvalidArguments();
+    if (isNullOrUndefined(span)) {
+      throw new Errors.InvalidArguments();
     }
 
     this.insertSpan(span, this.length);
@@ -54,8 +53,8 @@ export class Chain extends AbstractReadable {
    * @param position Position to insert span
    */
   insertSpan(span:AbstractSpan, position:number):void {
-    if (span == null) {
-      throw new ErrorClass.InvalidArguments();
+    if (isNullOrUndefined(span)) {
+      throw new Errors.InvalidArguments();
     }
 
     this.insertChain(new Chain([span]), position);
@@ -68,23 +67,23 @@ export class Chain extends AbstractReadable {
     * @param position Position to insert spans
     */
   insertChain(chain:Chain, position:number):void {
-    if (chain == null || chain == this) {
-      throw new ErrorClass.InvalidArguments();
+    if (isNullOrUndefined(chain) || chain === this) {
+      throw new Errors.InvalidArguments();
     }
 
     let me_range:Range = new QRange(this.length);
 
     if (this.length + chain.length > Number.MAX_SAFE_INTEGER) {
-      throw new ErrorClass.InvalidArguments();
+      throw new Errors.InvalidArguments();
     }
 
     if (!me_range.isPositionInside(position)) {
-      if (!(this.length == 0 && position == 0) && !(position == this.length)) {
-        throw new ErrorClass.AccessRange();
+      if (!(this.length === 0 && position === 0) && !(position === this.length)) {
+        throw new Errors.AccessRange();
       }
     }
 
-    if (position == this.length) { // equivalent of pushing span
+    if (position === this.length) { // equivalent of pushing span
       for (let span of chain._chain) {
         this._chain.push(span);
       }
@@ -103,20 +102,20 @@ export class Chain extends AbstractReadable {
    */
   removeRange(start:number, size:number):void {
     if (!new Range(start, size).valid) {
-      throw new ErrorClass.InvalidArguments();
+      throw new Errors.InvalidArguments();
     }
 
     if (!new QRange(this.length).containsRange(new Range(start, size))) {
-      throw new ErrorClass.AccessRange();
+      throw new Errors.AccessRange();
     }
 
-    if (size == 0) {
+    if (size === 0) {
       return;
     }
 
     let pd_start:ChainPositionData = this.splitAtPosition(start);
 
-    if (start + size == this.length) {
+    if (start + size === this.length) {
       // if we should remove last span too, there is no index of next span after remove area
       this._chain.splice(pd_start.span_index, this._chain.length - pd_start.span_index);
     } else {
@@ -135,21 +134,21 @@ export class Chain extends AbstractReadable {
    */
   takeChain(start:number, size:number):Chain {
     if (!new Range(start, size).valid) {
-      throw new ErrorClass.InvalidArguments();
+      throw new Errors.InvalidArguments();
     }
 
     if (!new QRange(this.length).containsRange(new Range(start, size))) {
-      throw new ErrorClass.AccessRange();
+      throw new Errors.AccessRange();
     }
 
-    if (size == 0) {
+    if (size === 0) {
       return new Chain();
     }
 
     let pd_start:ChainPositionData = this.splitAtPosition(start);
 
     let span_count;
-    if (start + size == this.length) {
+    if (start + size === this.length) {
       span_count = this._chain.length - pd_start.span_index;
     } else {
       let pd_finish:ChainPositionData = this.splitAtPosition(start + size);
@@ -170,7 +169,7 @@ export class Chain extends AbstractReadable {
     let me_range:Range = new QRange(this.length);
 
     if (!me_range.isPositionInside(position)) {
-      throw new ErrorClass.AccessRange();
+      throw new Errors.AccessRange();
     }
 
     let cur_pos = 0;
@@ -184,7 +183,7 @@ export class Chain extends AbstractReadable {
       cur_pos += this._chain[j].length;
     }
 
-    throw new ErrorClass.ObjectInconsistence();
+    throw new Errors.ObjectInconsistency();
   }
 
   /**
@@ -196,7 +195,7 @@ export class Chain extends AbstractReadable {
   splitAtPosition(position:number):ChainPositionData {
     let pd:ChainPositionData = this.positionData(position);
 
-    if (pd.span_position_offset != 0) {
+    if (pd.span_position_offset !== 0) {
       let splitted:AbstractSpan[] = this._chain[pd.span_index].split(pd.span_position_offset);
       this._chain.splice(pd.span_index, 1, ...splitted);
 
@@ -219,45 +218,45 @@ export class Chain extends AbstractReadable {
 
   get length():number { return this._length; }
 
-  _do_readToStream(stream:DataReadStream, cur_offset:number, read_size:number):void {
-    let pd_start:ChainPositionData = this.positionData(cur_offset);
-    let cur_span_index:number = pd_start.span_index, remains:number = read_size;
-    let out_buf:Buffer;
-    let self = this;
+  _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer> {
+    return new Promise<Buffer>((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
+      let pd_start:ChainPositionData = this.positionData(cur_offset);
+      let cur_span_index:number = pd_start.span_index, remains:number = read_size;
+      let out_buf:Buffer;
+      let self = this;
 
-    function push_buf(b:Buffer) {
-      out_buf = out_buf == null ? b : Buffer.concat([out_buf, b]);
-      remains -= b.length;
-    }
+      function add_buf(b:Buffer) {
+        out_buf = out_buf === undefined ? b : Buffer.concat([out_buf, b]);
+        remains -= b.length;
+      }
 
-    function process() {
-      function process_next() {
-        if (remains > 0) {
-          ++cur_span_index;
-          process();
-        } else {
-          if (stream._do_push(out_buf)) {
-            stream._do_end();
+      function process() {
+        function process_next() {
+          if (remains > 0) {
+            ++cur_span_index;
+            process();
+          } else {
+            resolve(out_buf);
           }
         }
+
+        let cur_span = self._chain[cur_span_index], span_read_pos:number = 0, span_avail_size:number = cur_span.length;
+
+        if (cur_span_index === pd_start.span_index) {
+          // first iteration, take span data offset into account
+          span_read_pos = pd_start.span_position_offset;
+          span_avail_size = new QRange(cur_span.length).itemsFrom(span_read_pos);
+        }
+
+        let span_read_size:number = Math.min(remains, span_avail_size);
+
+        cur_span.read(span_read_pos, span_read_size).on('data', (d:Buffer) => {
+          add_buf(d);
+        }).on('end', process_next).on('error', reject);
       }
 
-      let cur_span = self._chain[cur_span_index], span_read_pos:number = 0, span_avail_size:number = cur_span.length;
-
-      if (cur_span_index == pd_start.span_index) {
-        // first iteration, take span data offset into account
-        span_read_pos = pd_start.span_position_offset;
-        span_avail_size = new QRange(cur_span.length).itemsFrom(span_read_pos);
-      }
-
-      let span_read_size:number = Math.min(remains, span_avail_size);
-
-      cur_span.read(span_read_pos, span_read_size).on('data', (d:Buffer) => {
-        push_buf(d);
-      }).on('end', process_next).on('error', (err:Error) => stream._do_error(err));
-    }
-
-    process();
+      process();
+    });
   }
 
   protected static _calcLength(spans:AbstractSpan[]) {

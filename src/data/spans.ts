@@ -1,7 +1,7 @@
-import { Readable } from 'stream';
-import { ErrorClass } from '../utils/error';
+import * as Errors from '../utils/errors';
+import { isNullOrUndefined } from '../utils/utils';
 import { Range, QRange } from '../utils/range';
-import { DataReadStream, AbstractReadable } from './stream';
+import { AbstractReadable } from './stream';
 import { AbstractDataSource, FillDataSource, BufferDataSource } from './source';
 
 /**
@@ -21,14 +21,14 @@ export abstract class AbstractSpan extends AbstractReadable {
    */
   split(position:number):AbstractSpan[] {
     if (!new QRange(this.length).isPositionInside(position)) {
-      throw new ErrorClass.AccessRange()
+      throw new Errors.AccessRange();
     } else {
       return this._do_split(position);
     }
   }
 
   /**
-   * Implement custom span splitting logic here. Assume that \p offset is valid.
+   * Implement custom span splitting logic here. Assume \p offset is valid.
    */
   protected abstract _do_split(offset:number):AbstractSpan[];
 }
@@ -41,11 +41,11 @@ export class SourceSpan extends AbstractSpan {
               public source_length?:number) {
     super();
 
-    if (source == null) {
-      throw new ErrorClass.InvalidArguments();
+    if (isNullOrUndefined(source)) {
+      throw new Errors.InvalidArguments();
     }
 
-    if (this.source_offset == null) {
+    if (isNullOrUndefined(source_offset)) {
       this.source_offset = 0;
     }
 
@@ -53,46 +53,38 @@ export class SourceSpan extends AbstractSpan {
         span_range = new Range(this.source_offset, this.source_length);
 
     if (!span_range.valid) {
-      throw new ErrorClass.InvalidArguments();
+      throw new Errors.InvalidArguments();
     }
 
-    if (this.source_length == null) {
+    if (isNullOrUndefined(source_length)) {
       this.source_length = source_range.itemsFrom(this.source_offset);
     }
 
     if (!source_range.containsRange(span_range)) {
-      throw new ErrorClass.AccessRange();
+      throw new Errors.AccessRange();
     }
   }
 
   get length():number { return this.source_length; }
 
-  _do_readToStream(stream:DataReadStream, cur_offset:number, read_size:number):void {
-    let out_buf;
+  _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer> {
+    return new Promise<Buffer>((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
+      let out_buf;
 
-    this.source.read(cur_offset + this.source_offset, read_size).on('data', (d:Buffer) => {
-      if (out_buf === undefined) {
-        out_buf = d;
-      } else {
-        out_buf = Buffer.concat([out_buf, d]);
-      }
-    }).on('end', () => {
-      if (out_buf === undefined) {
-        stream._do_end();
-      } else {
-        if (stream._do_push(out_buf)) {
-          stream._do_end();
+      this.source.read(cur_offset + this.source_offset, read_size).on('data', (d:Buffer) => {
+        if (out_buf === undefined) {
+          out_buf = d;
+        } else {
+          out_buf = Buffer.concat([out_buf, d]);
         }
-      }
-    }).on('error', (err:Error) => {
-      stream._do_error(new ErrorClass.IO(null, err));
+      }).on('end', () => resolve(out_buf)).on('error', reject);
     });
   }
 
   _do_split(offset:number):SourceSpan[] {
     let span_range = new QRange(this.length);
 
-    if (offset == 0) {
+    if (offset === 0) {
       return [null, new SourceSpan(this.source, this.source_offset, this.source_length)];
     } else {
       return [new SourceSpan(this.source, this.source_offset, offset),

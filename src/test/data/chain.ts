@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import { ChainPositionData, Chain } from '../../data/chain';
 import { AbstractSpan, FillSpan } from '../../data/spans';
-import { ErrorClass } from '../../utils/error';
+import * as Errors from '../../utils/errors';
+import { isNullOrUndefined } from '../../utils/utils';
+import { check_read, check_read_all } from './_common';
 import * as async from 'async';
 
 function read_chain(chain:Chain):Promise<Buffer> {
@@ -10,7 +12,7 @@ function read_chain(chain:Chain):Promise<Buffer> {
   return new Promise((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
     async.eachSeries(chain.spans, (span:AbstractSpan, async_callback:ErrorCallback) => {
       span.readAll().on('data', (d:Buffer) => {
-        if (out_buf == null) {
+        if (isNullOrUndefined(out_buf)) {
           out_buf = d;
         } else {
           out_buf = Buffer.concat([out_buf, d]);
@@ -19,8 +21,8 @@ function read_chain(chain:Chain):Promise<Buffer> {
         async_callback(err);
       });
     }, function(err:Error):void {
-      if (err == null) {
-        resolve(out_buf == null ? new Buffer(0) : out_buf);
+      if (isNullOrUndefined(err)) {
+        resolve(out_buf === undefined ? new Buffer(0) : out_buf);
       } else {
         reject(err);
       }
@@ -62,7 +64,7 @@ describe('Chain', function() {
     });
 
     it('should not accept null span', function() {
-      expect(() => chain.pushSpan(null)).to.throw(ErrorClass.InvalidArguments);
+      expect(() => chain.pushSpan(null)).to.throw(Errors.InvalidArguments);
     });
 
     it('should change its length', function() {
@@ -122,15 +124,15 @@ describe('Chain', function() {
 
   describe('insertSpan', function() {
     it('should not accept null span', function() {
-      expect(() => chain.insertSpan(null, 10)).throws(ErrorClass.InvalidArguments);
+      expect(() => chain.insertSpan(null, 10)).throws(Errors.InvalidArguments);
     });
 
     it('should not overflow chain length', function() {
-      expect(() => chain.insertSpan(new FillSpan(Number.MAX_SAFE_INTEGER), 10)).throws(ErrorClass.InvalidArguments);
+      expect(() => chain.insertSpan(new FillSpan(Number.MAX_SAFE_INTEGER), 10)).throws(Errors.InvalidArguments);
     });
 
     it('should throw when position is outside range', function() {
-      expect(() => chain.insertSpan(new FillSpan(10), 100)).throws(ErrorClass.AccessRange);
+      expect(() => chain.insertSpan(new FillSpan(10), 100)).throws(Errors.AccessRange);
     });
 
     it('should not throw when inserting to empty chain at zero position', function() {
@@ -174,11 +176,11 @@ describe('Chain', function() {
 
   describe('insertChain', function() {
     it('should not accept null chain', function() {
-      expect(() => chain.insertChain(null, 10)).throws(ErrorClass.InvalidArguments);
+      expect(() => chain.insertChain(null, 10)).throws(Errors.InvalidArguments);
     });
 
     it('should not allow inserting chain into itself', function() {
-      expect(() => chain.insertChain(chain, 10)).throws(ErrorClass.InvalidArguments);
+      expect(() => chain.insertChain(chain, 10)).throws(Errors.InvalidArguments);
     });
 
     it('should correctly insert some chain', function(done:MochaDone) {
@@ -198,7 +200,7 @@ describe('Chain', function() {
 
   describe('positionData', function() {
     it('should throw when position is outside range', function() {
-      expect(() => chain.positionData(60)).throws(ErrorClass.AccessRange);
+      expect(() => chain.positionData(60)).throws(Errors.AccessRange);
     });
 
     it('should return correct result when position is inside some span', function() {
@@ -258,11 +260,11 @@ describe('Chain', function() {
 
   describe('removeRange', function() {
     it('should throw when range is invalid', function() {
-      expect(() => chain.removeRange(10, -10)).throws(ErrorClass.InvalidArguments);
+      expect(() => chain.removeRange(10, -10)).throws(Errors.InvalidArguments);
     });
 
     it('should throw when removing more data that is available', function() {
-      expect(() => chain.removeRange(10, 51)).throws(ErrorClass.AccessRange);
+      expect(() => chain.removeRange(10, 51)).throws(Errors.AccessRange);
     });
 
     it('should do nothing when removing zero number of bytes', function(done:MochaDone) {
@@ -296,11 +298,11 @@ describe('Chain', function() {
 
   describe('takeChain', function() {
     it('should throw when range is invalid', function() {
-      expect(() => chain.takeChain(10, -10)).throws(ErrorClass.InvalidArguments);
+      expect(() => chain.takeChain(10, -10)).throws(Errors.InvalidArguments);
     });
 
-    it('should throw when removing more data that is available', function() {
-      expect(() => chain.takeChain(10, 51)).throws(ErrorClass.AccessRange);
+    it('should throw when removing more data than is available', function() {
+      expect(() => chain.takeChain(10, 51)).throws(Errors.AccessRange);
     });
 
     it('should return empty chain when taking zero length data', function() {
@@ -346,23 +348,15 @@ describe('Chain', function() {
 
   describe('read', function() {
     it('should correctly read data from single span', function(done:MochaDone) {
-      chain.read(2, 3).on('data', (d:Buffer) => {
-        expect(d.equals(Buffer.alloc(3, 0))).to.be.true;
-      }).on('end', done).on('error', () => expect.fail());
+      check_read(chain, 2, 3, Buffer.alloc(3, 0), done);
     });
 
     it('should correctly read from several spans', function(done:MochaDone) {
-      chain.read(2, 10).on('data', (d:Buffer) => {
-        let et_buf = Buffer.concat([Buffer.alloc(8, 0), Buffer.alloc(2, 1)]);
-        expect(d.equals(et_buf)).to.be.true;
-      }).on('end', done).on('error', () => expect.fail());
+      check_read(chain, 2, 10, Buffer.concat([Buffer.alloc(8, 0), Buffer.alloc(2, 1)]), done);
     });
 
     it('should correctly read all', function(done:MochaDone) {
-      chain.readAll().on('data', (d:Buffer) => {
-        let et_buf = Buffer.concat([Buffer.alloc(10, 0), Buffer.alloc(20, 1), Buffer.alloc(30, 2)]);
-        expect(d.equals(et_buf)).to.be.true;
-      }).on('end', done).on('error', () => expect.fail());
+      check_read_all(chain, Buffer.concat([Buffer.alloc(10, 0), Buffer.alloc(20, 1), Buffer.alloc(30, 2)]), done);
     });
   });
 });

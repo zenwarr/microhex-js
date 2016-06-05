@@ -1,8 +1,8 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import { ErrorClass } from '../utils/error';
-import { Range, QRange } from '../utils/range';
-import { DataReadStream, AbstractReadable } from './stream';
+import * as Errors from '../utils/errors';
+import { isNullOrUndefined } from '../utils/utils';
+import { AbstractReadable } from './stream';
 
 export abstract class AbstractDataSource extends AbstractReadable {
   constructor(protected _url:string) {
@@ -11,10 +11,8 @@ export abstract class AbstractDataSource extends AbstractReadable {
 
   get url():string { return this._url; }
 
-  get writeable():boolean { return false; }
-
   static generateSourceUrl(scheme:string):string {
-    if (scheme == null) {
+    if (isNullOrUndefined(scheme)) {
       scheme = 'generic';
     }
     return `${scheme}:\\${crypto.randomBytes(10).toString('hex')}`;
@@ -30,20 +28,20 @@ export class FillDataSource extends AbstractDataSource {
     super(AbstractDataSource.generateSourceUrl('fill'));
 
     if (_fill_size > Number.MAX_SAFE_INTEGER) {
-      throw new ErrorClass.InvalidArguments();
+      throw new Errors.InvalidArguments();
     }
 
-    if (this._fill_byte == null) {
+    if (isNullOrUndefined(this._fill_byte)) {
       this._fill_byte = 0;
     }
   }
 
   get length():number { return this._fill_size; }
 
-  _do_readToStream(stream:DataReadStream, cur_offset:number, read_size:number):void {
-    if (stream._do_push(Buffer.alloc(read_size, this._fill_byte))) {
-      stream._do_end();
-    }
+  _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer> {
+    return new Promise<Buffer>((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
+      resolve(Buffer.alloc(read_size, this._fill_byte));
+    });
   }
 }
 
@@ -57,21 +55,19 @@ export class BufferDataSource extends AbstractDataSource {
 
   get length():number { return this._buf.length; }
 
-  _do_readToStream(stream:DataReadStream, cur_offset:number, read_size:number):void {
-    if (stream._do_push(this._buf.slice(cur_offset, cur_offset + read_size))) {
-      stream._do_end();
-    }
+  _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer> {
+    return new Promise<Buffer>((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
+      resolve(this._buf.slice(cur_offset, cur_offset + read_size));
+    });
   }
 }
 
 export class FileDataSource extends AbstractDataSource {
-  protected _size:number = 0;
-
   constructor(protected _filename:string, protected _fd:number, protected _stat:fs.Stats) {
     super('file://' + _filename);
 
-    if (!Number.isFinite(_fd) || _fd < 0 || _stat == null) {
-      throw new ErrorClass.InvalidArguments();
+    if (!Number.isFinite(_fd) || _fd < 0 || isNullOrUndefined(_stat)) {
+      throw new Errors.InvalidArguments();
     }
   }
 
@@ -82,12 +78,12 @@ export class FileDataSource extends AbstractDataSource {
   static create(filename:string, flags:string, mode?:number):Promise<FileDataSource> {
     return new Promise<FileDataSource>( (resolve:(r:FileDataSource)=>void, reject:(r:Error)=>void) => {
       fs.open(filename, flags, mode, (err:Error, fd:number) => {
-        if (err != null) {
-          reject(new ErrorClass.IO(null, err));
+        if (!isNullOrUndefined(err)) {
+          reject(new Errors.IO(null, err));
         } else {
-          fs.fstat(fd, (err:Error, stat:fs.Stats) => {
-            if (err != null) {
-              reject(new ErrorClass.IO(null, err));
+          fs.fstat(fd, (fstat_err:Error, stat:fs.Stats) => {
+            if (!isNullOrUndefined(fstat_err)) {
+              reject(new Errors.IO(null, fstat_err));
             } else {
               resolve(new FileDataSource(filename, fd, stat));
             }
@@ -97,14 +93,21 @@ export class FileDataSource extends AbstractDataSource {
     });
   }
 
-  _do_readToStream(stream:DataReadStream, cur_offset:number, read_size:number):void {
-    let out_buf = Buffer.allocUnsafe(read_size);
-    fs.read(this._fd, out_buf, 0, read_size, cur_offset, (err:Error, bytes_read:number, buf:Buffer) => {
-      if (err != null) {
+  _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer> {
+    return new Promise<Buffer>((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
+      let out_buf = Buffer.allocUnsafe(read_size);
 
-      } else {
-        stream._do_push(out_buf);
-      }
+      fs.read(this._fd, out_buf, 0, read_size, cur_offset, (err:Error, bytes_read:number, buf:Buffer) => {
+        if (!isNullOrUndefined(err)) {
+          reject(err);
+        } else {
+          if (bytes_read < out_buf.length) {
+            resolve(out_buf.slice(0, bytes_read)); // prevent placing unsafe data into output buffer
+          } else {
+            resolve(out_buf);
+          }
+        }
+      });
     });
   }
 }

@@ -3,28 +3,25 @@ import * as os from 'os';
 import * as crypto from 'crypto';
 import * as path from 'path';
 import * as fs from 'fs';
-import { FillDataSource, BufferDataSource, AbstractDataSource, FileDataSource } from '../../data/source';
-import { ErrorClass } from '../../utils/error';
+import { FillDataSource, BufferDataSource, FileDataSource } from '../../data/source';
+import * as Errors from '../../utils/errors';
+import { check_read } from './_common';
 
 describe('FillDataSource', function() {
   let source:FillDataSource;
 
   it('should have correct length', function() {
     source = new FillDataSource(10);
-
     expect(source.length).to.equal(10);
   });
 
   it('should correctly read', function(done:MochaDone) {
     source = new FillDataSource(10, 0);
-
-    source.read(4, 3).on('data', (d:Buffer) => {
-      expect(d.equals(Buffer.alloc(3, 0))).to.be.true;
-    }).on('end', () => done()).on('error', () => expect.fail());
+    check_read(source, 4, 3, Buffer.alloc(3, 0), done);
   });
 
   it('should throw when length is unsafe', function() {
-    expect(() => new FillDataSource(Number.MAX_SAFE_INTEGER + 1)).throws(ErrorClass.InvalidArguments);
+    expect(() => new FillDataSource(Number.MAX_SAFE_INTEGER + 1)).throws(Errors.InvalidArguments);
   });
 });
 
@@ -39,10 +36,7 @@ describe('BufferDataSource', function() {
 
   it('should correctly read', function(done:MochaDone) {
     source = new BufferDataSource(new Buffer('0123456789'));
-
-    source.read(4, 3).on('data', (d:Buffer) => {
-      expect(d.equals(new Buffer('456'))).to.be.true;
-    }).on('end', () => done()).on('error', () => expect.fail);
+    check_read(source, 4, 3, new Buffer('456'), done);
   });
 });
 
@@ -58,6 +52,8 @@ describe('FileDataSource', function() {
     FileDataSource.create(temp_filename, 'r').then((source:FileDataSource) => {
       expect(source).not.null;
       done();
+    }, function(err:Error) {
+      expect.fail();
     });
   });
 
@@ -78,9 +74,7 @@ describe('FileDataSource', function() {
     });
 
     it('should correcly read', function(done:MochaDone) {
-      source.read(3, 4).on('data', (d:Buffer) => expect(d.equals(new Buffer('3456'))).to.be.true)
-                       .on('end', () => done())
-                       .on('error', () => expect.fail());
+      check_read(source, 3, 4, new Buffer('3456'), done);
     });
   });
 });

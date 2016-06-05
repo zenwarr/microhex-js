@@ -41,7 +41,7 @@ export class Range {
     if (typeof start_or_range === 'number') {
       return this.getInsideSize_p(new Range(start_or_range, size));
     } else {
-      return this.getInsideSize_p(start_or_range)
+      return this.getInsideSize_p(start_or_range);
     }
   }
 

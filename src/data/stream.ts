@@ -1,5 +1,6 @@
 import { Readable } from 'stream';
-import { ErrorClass } from '../utils/error';
+import * as Errors from '../utils/errors';
+import { isNullOrUndefined } from '../utils/utils';
 import { Range, QRange } from '../utils/range';
 
 /**
@@ -14,8 +15,9 @@ export class DataReadStream extends Readable {
   private already_read: number = 0;
 
   /**
-   * @param  offset    Readable offset to start reading from
-   * @param  min_size  Read at least specified number of bytes
+   * @param  readable_obj Instance of AbstractReadable object to read from
+   * @param  offset       Readable offset to start reading from
+   * @param  min_size     Read at least specified number of bytes
    */
   constructor(public readable_obj:AbstractReadable, public offset:number, public min_size:number) {
     super();
@@ -29,12 +31,8 @@ export class DataReadStream extends Readable {
     if (this.already_read >= this.min_size) {
       this._do_end(); // do not read anything more if min_size number of bytes was sent
     } else {
-      if (size == null) { // \p size if data chunk size provided by Node
-        size = Number.MAX_SAFE_INTEGER; // to lose in comparision below
-      }
-
       // find how many bytes we should read now. Do not read more that min_size bytes.
-      let actual_read_size = Math.min(this.min_size - this.already_read, size);
+      let actual_read_size = this.min_size - this.already_read;
 
       this._do_readToStream(this.offset + this.already_read, actual_read_size);
     }
@@ -46,8 +44,13 @@ export class DataReadStream extends Readable {
 
   // helper function to push data into stream
   _do_push(buf:Buffer):boolean {
-    this.already_read += buf.length;
-    return this.push(buf);
+    if (buf === null) {
+      console.warn('DataReadStream._do_push got null buffer as argument, signalling end');
+      this._do_end();
+    } else {
+      this.already_read += buf.length;
+      return this.push(buf);
+    }
   }
 
   // helper function to indicate end of reading
@@ -68,7 +71,7 @@ export abstract class AbstractReadable {
    * Returns number of bytes in this readable.
    */
   get length():number {
-    throw new ErrorClass.NotImplemented();
+    throw new Errors.NotImplemented();
   }
 
   /**
@@ -83,7 +86,7 @@ export abstract class AbstractReadable {
    * accessible from given offset.
    */
   read(offset:number, min_size?:number):DataReadStream {
-    if (min_size == null) { // no min_size given, make it maximal
+    if (isNullOrUndefined(min_size)) { // no min_size given, make it maximal
       min_size = new QRange(this.length).itemsFrom(offset); // find how many bytes we can read starting from this offset
     }
 
@@ -91,7 +94,7 @@ export abstract class AbstractReadable {
         read_range = new Range(offset, min_size);
 
     if (!read_range.valid || span_range.itemsFrom(offset) < min_size || !span_range.isPositionInside(offset)) {
-      throw new ErrorClass.AccessRange();
+      throw new Errors.AccessRange();
     }
 
     return this._do_createReadableStream(offset, min_size);
@@ -117,26 +120,37 @@ export abstract class AbstractReadable {
         read_range = new Range(cur_offset, size);
 
     if (!read_range.valid) {
-      stream._do_error(new ErrorClass.AccessRange());
+      stream._do_error(new Errors.AccessRange());
     }
 
     let read_size = readable_range.getInsideSize(read_range);
 
-    if (read_size == 0) {
+    if (read_size === 0) {
       stream._do_end();
     } else {
       try {
-        this._do_readToStream(stream, cur_offset, size);
+        let ret:Promise<Buffer> = this._do_readToStream(cur_offset, size);
+
+        ret.then((d:Buffer) => {
+          if (d === null || d === undefined) {
+            stream._do_end();
+          } else {
+            if (!stream._do_push(d)) {
+              stream._do_end();
+            }
+          }
+        }, (err:Error) => {
+          stream._do_error(new Errors.IO(null, err));
+        });
       } catch (err) {
-        stream._do_error(err);
+        stream._do_error(new Errors.IO(null, err));
       }
     }
   }
 
   /**
-   * @param      stream      The stream which we should operate on
    * @param      cur_offset  The current offset to read data
-   * @param      size        The maximal size of bytes to read (optional)
+   * @param      read_size   The maximal size of bytes to read (optional)
    *
    * Implement this function in Readable object to allow reading from it. This
    * function should use _do_push and _do_end methods on \p stream to return data.
@@ -145,5 +159,5 @@ export abstract class AbstractReadable {
    * This function is called by node stream implementation multiple times until the end of
    * stream will be reached. \p cur_offset and \p size arguments should be considered as valid.
    */
-  abstract _do_readToStream(stream:DataReadStream, cur_offset:number, read_size:number):void;
+  abstract _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer>;
 }
