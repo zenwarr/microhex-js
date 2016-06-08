@@ -1,5 +1,5 @@
 import * as Errors from '../utils/errors';
-import { isNullOrUndefined } from '../utils/utils';
+import { isNullOrUndefined, BufferAggregator } from '../utils/utils';
 import { Range, QRange } from '../utils/range';
 import { AbstractReadable } from './stream';
 import { AbstractDataSource, FillDataSource, BufferDataSource } from './source';
@@ -68,16 +68,12 @@ export class SourceSpan extends AbstractSpan {
   get length():number { return this.source_length; }
 
   _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer> {
-    return new Promise<Buffer>((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
-      let out_buf;
+    return new Promise<Buffer>((resolve:PromiseResolve<Buffer>, reject:PromiseReject) => {
+      let out_buf = new BufferAggregator();
 
       this.source.read(cur_offset + this.source_offset, read_size).on('data', (d:Buffer) => {
-        if (out_buf === undefined) {
-          out_buf = d;
-        } else {
-          out_buf = Buffer.concat([out_buf, d]);
-        }
-      }).on('end', () => resolve(out_buf)).on('error', reject);
+        out_buf.add(d);
+      }).on('end', () => resolve(out_buf.buf)).on('error', reject);
     });
   }
 

@@ -219,7 +219,7 @@ export class Chain extends AbstractReadable {
   get length():number { return this._length; }
 
   _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer> {
-    return new Promise<Buffer>((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
+    return new Promise<Buffer>((resolve:PromiseResolve<Buffer>, reject:PromiseReject) => {
       let pd_start:ChainPositionData = this.positionData(cur_offset);
       let cur_span_index:number = pd_start.span_index, remains:number = read_size;
       let out_buf:Buffer;
@@ -252,7 +252,13 @@ export class Chain extends AbstractReadable {
 
         cur_span.read(span_read_pos, span_read_size).on('data', (d:Buffer) => {
           add_buf(d);
-        }).on('end', process_next).on('error', reject);
+        }).on('end', () => {
+          try {
+            process_next();
+          } catch(err) {
+            reject(err);
+          }
+        }).on('error', reject);
       }
 
       process();

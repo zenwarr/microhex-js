@@ -9,7 +9,7 @@ import * as async from 'async';
 function read_chain(chain:Chain):Promise<Buffer> {
   let out_buf:Buffer;
 
-  return new Promise((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
+  return new Promise((resolve:PromiseResolve<Buffer>, reject:PromiseReject) => {
     async.eachSeries(chain.spans, (span:AbstractSpan, async_callback:ErrorCallback) => {
       span.readAll().on('data', (d:Buffer) => {
         if (isNullOrUndefined(out_buf)) {

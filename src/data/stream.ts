@@ -5,7 +5,7 @@ import { Range, QRange } from '../utils/range';
 
 /**
  * @brief Implementation of node readable stream that operates on abstract source data. You should
- * not create streams by youself to read object data, as it does no range checks. Use AbstractReadable
+ * not create streams by yourself to read object data, as it does no range checks. Use AbstractReadable
  * methods instead.
  */
 export class DataReadStream extends Readable {
@@ -47,6 +47,7 @@ export class DataReadStream extends Readable {
     if (buf === null) {
       console.warn('DataReadStream._do_push got null buffer as argument, signalling end');
       this._do_end();
+      return false;
     } else {
       this.already_read += buf.length;
       return this.push(buf);

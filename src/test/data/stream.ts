@@ -50,7 +50,7 @@ describe('AbstractReadable', function() {
 
       done();
 
-      return new Promise<Buffer>((resolve:(d:Buffer)=>void, reject:(e:Error)=>void) => {
+      return new Promise<Buffer>((resolve:PromiseResolve<Buffer>, reject:PromiseReject) => {
         resolve(Buffer.alloc(5));
       });
     };
@@ -65,7 +65,7 @@ describe('AbstractReadable', function() {
 
       done();
 
-      return new Promise<Buffer>((resolve:(d:Buffer)=>void, reject:(e:Error)=>void) => {
+      return new Promise<Buffer>((resolve:PromiseResolve<Buffer>, reject:PromiseReject) => {
         resolve(Buffer.alloc(10));
       });
     };
@@ -92,7 +92,7 @@ describe('AbstractReadable', function() {
 
       done();
 
-      return new Promise<Buffer>((resolve:(d:Buffer)=>void, reject:(e:Error)=>void) => {
+      return new Promise<Buffer>((resolve:PromiseResolve<Buffer>, reject:PromiseReject) => {
         resolve(Buffer.alloc(7));
       });
     };
@@ -107,7 +107,7 @@ describe('AbstractReadable', function() {
 
       done();
 
-      return new Promise<Buffer>((resolve:(d:Buffer)=>void, reject:(e:Error)=>void) => {
+      return new Promise<Buffer>((resolve:PromiseResolve<Buffer>, reject:PromiseReject) => {
         resolve(Buffer.alloc(1));
       });
     };
@@ -119,7 +119,7 @@ describe('AbstractReadable', function() {
     readable_mock._do_readToStream = function(offset:number, size:number) {
       expect.fail(); // should not get to this position
 
-      return new Promise<Buffer>((resolve:(d:Buffer)=>void, reject:(e:Error)=>void) => {
+      return new Promise<Buffer>((resolve:PromiseResolve<Buffer>, reject:PromiseReject) => {
         reject(new Errors.InvalidArguments());
       });
     };

@@ -2,7 +2,11 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es6",
-    "sourceMap": true
+    "sourceMap": true,
+    "noImplicitUseStrict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noEmitOnError": true
   },
   "files": [
     "./src/app.ts",
@@ -11,14 +15,20 @@
     "./src/data/source.ts",
     "./src/data/spans.ts",
     "./src/data/stream.ts",
+    "./src/data/codecs.ts",
+    "./src/test/data/_common.ts",
     "./src/test/data/chain.ts",
     "./src/test/data/document.ts",
     "./src/test/data/source.ts",
     "./src/test/data/spans.ts",
     "./src/test/data/stream.ts",
+    "./src/test/data/codecs.ts",
+    "./src/test/helper.ts",
     "./src/test/utils/range.ts",
     "./src/utils/errors.ts",
+    "./src/utils/index.d.ts",
     "./src/utils/range.ts",
+    "./src/utils/utils.ts",
     "./client_src/js/client.ts",
     "./typings/index.d.ts"
   ],

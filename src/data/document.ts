@@ -7,7 +7,7 @@ import { Chain } from './chain';
 export class Document extends AbstractReadable {
   protected _chain:Chain;
 
-  constructor(protected _source?:AbstractDataSource = null) {
+  constructor(protected _source:AbstractDataSource = null) {
     super();
 
     if (!isNullOrUndefined(this._source)) {

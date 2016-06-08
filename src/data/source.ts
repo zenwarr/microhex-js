@@ -39,7 +39,7 @@ export class FillDataSource extends AbstractDataSource {
   get length():number { return this._fill_size; }
 
   _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer> {
-    return new Promise<Buffer>((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
+    return new Promise<Buffer>((resolve:PromiseResolve<Buffer>, reject:PromiseReject) => {
       resolve(Buffer.alloc(read_size, this._fill_byte));
     });
   }
@@ -56,7 +56,7 @@ export class BufferDataSource extends AbstractDataSource {
   get length():number { return this._buf.length; }
 
   _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer> {
-    return new Promise<Buffer>((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
+    return new Promise<Buffer>((resolve:PromiseResolve<Buffer>, reject:PromiseReject) => {
       resolve(this._buf.slice(cur_offset, cur_offset + read_size));
     });
   }
@@ -76,7 +76,7 @@ export class FileDataSource extends AbstractDataSource {
   get length():number { return this._stat.size; }
 
   static create(filename:string, flags:string, mode?:number):Promise<FileDataSource> {
-    return new Promise<FileDataSource>( (resolve:(r:FileDataSource)=>void, reject:(r:Error)=>void) => {
+    return new Promise<FileDataSource>( (resolve:PromiseResolve<FileDataSource>, reject:PromiseReject) => {
       fs.open(filename, flags, mode, (err:Error, fd:number) => {
         if (!isNullOrUndefined(err)) {
           reject(new Errors.IO(null, err));
@@ -85,7 +85,11 @@ export class FileDataSource extends AbstractDataSource {
             if (!isNullOrUndefined(fstat_err)) {
               reject(new Errors.IO(null, fstat_err));
             } else {
-              resolve(new FileDataSource(filename, fd, stat));
+              try {
+                resolve(new FileDataSource(filename, fd, stat));
+              } catch (err) {
+                reject(err);
+              }
             }
           });
         }
@@ -94,7 +98,7 @@ export class FileDataSource extends AbstractDataSource {
   }
 
   _do_readToStream(cur_offset:number, read_size:number):Promise<Buffer> {
-    return new Promise<Buffer>((resolve:(b:Buffer)=>void, reject:(err:Error)=>void) => {
+    return new Promise<Buffer>((resolve:PromiseResolve<Buffer>, reject:PromiseReject) => {
       let out_buf = Buffer.allocUnsafe(read_size);
 
       fs.read(this._fd, out_buf, 0, read_size, cur_offset, (err:Error, bytes_read:number, buf:Buffer) => {

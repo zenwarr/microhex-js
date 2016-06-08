@@ -1,4 +1,4 @@
-interface ICustomError { // to allow passing class as paramater
+interface ICustomError { // to allow passing class as parameter
 
 }
 
@@ -7,7 +7,11 @@ export enum ErrorCode {
   NotImplemented,
   AccessRange,
   IO,
-  ObjectInconsistency
+  ObjectInconsistency,
+  DecodeError,
+  NoEnoughData,
+  PositionIsNotUnitStart,
+  DecodeFlowStop,
 }
 
 export class NError extends Error implements ICustomError {
@@ -64,5 +68,29 @@ export class IO extends NError {
 export class ObjectInconsistency extends NError {
   constructor(msg:string = 'Object is in inconsistent state', cause?:Error) {
     super(ObjectInconsistency, ErrorCode.ObjectInconsistency, msg, cause);
+  }
+}
+
+export class DecodeError extends NError {
+  constructor(msg:string = 'Error while decoding binary data', cause?:Error) {
+    super(DecodeError, ErrorCode.DecodeError, msg, cause);
+  }
+}
+
+export class NoEnoughData extends NError {
+  constructor(msg:string = 'No enough data for operation', cause?:Error) {
+    super(NoEnoughData, ErrorCode.NoEnoughData, msg, cause);
+  }
+}
+
+export class PositionIsNotUnitStart extends NError {
+  constructor(msg:string = 'Position given is not a unit start', cause?:Error) {
+    super(PositionIsNotUnitStart, ErrorCode.PositionIsNotUnitStart, msg, cause);
+  }
+}
+
+export class DecodeFlowStop extends NError {
+  constructor(msg:string = 'Binary flow decoding stopped due to previous error', cause?:Error) {
+    super(DecodeFlowStop, ErrorCode.DecodeFlowStop, msg, cause);
   }
 }
