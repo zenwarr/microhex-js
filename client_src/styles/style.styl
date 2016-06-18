@@ -1,56 +1,38 @@
+$font-editor = 'Monaco', 'Fira Mono', 'Consolas', 'Ubuntu Mono', 'Courier New', monospace;
+$font-ui = 'Segoe UI', serif;
+
+$color-tab-active = #222;
+
 body {
   margin: 0;
-}
-
-.column {
-  display: inline-block;
-  vertical-align: top;
-  padding: 10px;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
-
-  font-family: 'Ubuntu Mono', monospace;
-  font-size: 16px;
-  line-height: 20px;
-
-  color: gray;
-
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.column:first-child {
-  border-left: 0;
-}
-
-::selection {
-  background: lightgreen;
+  padding: 0;
+  background: black;
   color: white;
+  font-family: $font-ui;
 }
 
-.row {
-  white-space: nowrap;
-}
+.tabs {
+  user-select: none;
 
-.cell {
-  display: inline-block;
-  position: relative;
-  margin-right: 10px;
-  border: 1px solid transparent;
-  cursor: pointer;
+  &__tabs {
+    display: flex;
+    border-bottom: 1px solid $color-tab-active;
+  }
 
-  &--active {
-    background: lightgreen;
-    color: white;
-    border: 1px solid green;
+  &__panes {
+    padding: 10px;
   }
 }
 
-.cell:last-child {
-  margin-right: 0;
-}
+.tab {
+  width: 200px;
+  padding: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
 
-.query {
-  display: block;
-  margin-bottom: 10px;
+  &--active {
+    background: $color-tab-active;
+  }
 }

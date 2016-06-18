@@ -312,7 +312,7 @@ describe('Chain', function() {
     });
 
     it('should not modify existing data', function(done:MochaDone) {
-      let result:Chain = chain.takeChain(5, 10);
+      chain.takeChain(5, 10);
       read_chain(chain).then(function(b:Buffer) {
         let et_buf = Buffer.concat([Buffer.alloc(10, 0), Buffer.alloc(20, 1), Buffer.alloc(30, 2)]);
         expect(b.equals(et_buf)).to.be.true;

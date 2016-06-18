@@ -2,9 +2,16 @@
   "globalDependencies": {
     "async": "registry:dt/async#1.4.2+20160602152629",
     "chai": "registry:dt/chai#3.4.0+20160317120654",
+    "classnames": "registry:dt/classnames#0.0.0+20160316155526",
     "github-electron": "registry:dt/github-electron#1.2.1+20160602155650",
     "mocha": "registry:dt/mocha#2.2.5+20160317120654",
     "node": "registry:dt/node#6.0.0+20160602155235",
-    "react": "registry:dt/react#0.14.0+20160602151522"
+    "react": "registry:dt/react#0.14.0+20160602151522",
+    "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
+    "react-redux": "registry:dt/react-redux#4.4.0+20160501125835",
+    "redux": "registry:dt/redux#3.3.1+20160326112656",
+    "redux-devtools": "registry:dt/redux-devtools#3.0.0+20151215130854",
+    "redux-devtools-dock-monitor": "registry:dt/redux-devtools-dock-monitor#1.0.1+20151216103641",
+    "redux-devtools-log-monitor": "registry:dt/redux-devtools-log-monitor#1.0.1+20151216103641"
   }
 }

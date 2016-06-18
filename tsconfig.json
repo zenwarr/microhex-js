@@ -6,36 +6,15 @@
     "noImplicitUseStrict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noEmitOnError": true
+    "noEmitOnError": true,
+    "jsx": "react",
+    "outDir": "build"
   },
-  "files": [
-    "./src/app.ts",
-    "./src/data/chain.ts",
-    "./src/data/document.ts",
-    "./src/data/source.ts",
-    "./src/data/spans.ts",
-    "./src/data/stream.ts",
-    "./src/data/codecs.ts",
-    "./src/test/data/_common.ts",
-    "./src/test/data/chain.ts",
-    "./src/test/data/document.ts",
-    "./src/test/data/source.ts",
-    "./src/test/data/spans.ts",
-    "./src/test/data/stream.ts",
-    "./src/test/data/codecs.ts",
-    "./src/test/helper.ts",
-    "./src/test/utils/range.ts",
-    "./src/utils/errors.ts",
-    "./src/utils/index.d.ts",
-    "./src/utils/range.ts",
-    "./src/utils/utils.ts",
-    "./client_src/js/client.ts",
-    "./typings/index.d.ts"
-  ],
-  "filesGlob": [
-    "./src/**/*.ts",
-    "./client_src/**/*.ts",
-    "./typings/index.d.ts"
+  "exclude": [
+    "build",
+    "client",
+    "node_modules",
+    "webpack"
   ],
   "compileOnSave": true,
   "atom": {

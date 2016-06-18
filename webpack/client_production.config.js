@@ -1,28 +1,25 @@
 var webpack = require('webpack');
-var webpackTargetElectronRenderer = require('webpack-target-electron-renderer');
 var webpack_common = require('./common');
 
 var options = {
-  entry: './client_src/js/client.ts',
+  entry: './client_src/client.tsx',
+  target: 'electron-renderer',
   output: {
-    filename: './client/js/client.js'
+    filename: './client/client.js'
   },
   resolve: {
-    extensions: ['', '.webpack.js', '.ts', '.js'],
+    extensions: ['', '.webpack.js', '.ts', '.tsx', '.js'],
     modulesDirectories: ['node_modules']
   },
-  externals: [webpack_common.build_externals()],
   module: {
     loaders: [
       {
-        test: /\.ts$/,
+        test: /\.ts[x]?$/,
         loader: 'ts-loader'
       }
     ]
   },
   plugins: []
 };
-
-options.target = webpackTargetElectronRenderer(options);
 
 module.exports = options;
