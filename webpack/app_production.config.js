@@ -23,5 +23,12 @@ module.exports = {
       }
     ]
   },
-  plugins: []
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    }),
+    // new webpack.optimize.UglifyJsPlugin({
+    //   sourceMap: false
+    // }) // for now, UglifyJS does not support es6, so we do not minimize code for production
+  ]
 };

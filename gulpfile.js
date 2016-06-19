@@ -13,9 +13,9 @@ var ts = require('gulp-typescript');
  */
 
 gulp.task('stylus', function() {
-  gulp.src('client_src/styles/*.styl')
+  gulp.src('client/styles/*.styl')
       .pipe(stylus({}))
-      .pipe(gulp.dest('client/css'));
+      .pipe(gulp.dest('build/client/css'));
 });
 
 /*
@@ -23,8 +23,8 @@ gulp.task('stylus', function() {
  */
 
 gulp.task('html', function() {
-  gulp.src('client_src/*.html')
-      .pipe(gulp.dest('client/'));
+  gulp.src('client/*.html')
+      .pipe(gulp.dest('build/client/'));
 });
 
 /*
@@ -32,8 +32,8 @@ gulp.task('html', function() {
  */
 
 gulp.task('img', function() {
-  gulp.src('client_src/img/*.*')
-      .pipe(gulp.dest('client/img/'));
+  gulp.src('client/img/*.*')
+      .pipe(gulp.dest('build/client/img/'));
 });
 
 /*
@@ -55,7 +55,7 @@ gulp.task('app', function() {
 gulp.task('client', function() {
   const WEBPACK_CONFIG = PRODUCTION ? 'client_production' : 'client_development';
 
-  gulp.src('client_src/js/app.ts')
+  gulp.src('client/js/app.ts')
       .pipe(webpack(require(`./webpack/${WEBPACK_CONFIG}.config.js`)))
       .pipe(gulp.dest('.'));
 });
@@ -76,15 +76,15 @@ gulp.task('default:dev', function() {
 gulp.task('watch', function() {
   gulp.start('default:dev');
 
-  watch('client_src/styles/*.styl', function() {
+  watch('client/styles/*.styl', function() {
     gulp.start('stylus');
   });
 
-  watch('client_src/*.html', function() {
+  watch('client/*.html', function() {
     gulp.start('html');
   });
 
-  watch('client_src/img/*.*', function() {
+  watch('client/img/*.*', function() {
     gulp.start('img');
   });
 

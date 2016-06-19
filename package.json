@@ -33,9 +33,9 @@
   },
   "scripts": {
     "build": "typings install && gulp",
-    "build-dev": "gulp default:dev",
+    "build-dev": "typings install && gulp default:dev",
     "start": "electron .",
-    "build-tests": "webpack --config ./webpack/tests.config.js",
+    "build-tests": "typings install && webpack --config ./webpack/tests.config.js",
     "test": "mocha ./build/test/ --recursive",
     "build-and-test": "npm run build-tests && npm test"
   }

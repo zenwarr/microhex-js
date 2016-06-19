@@ -2,10 +2,10 @@ var webpack = require('webpack');
 var webpack_common = require('./common');
 
 var options = {
-  entry: './client_src/client.tsx',
+  entry: './client/client.tsx',
   target: 'electron-renderer',
   output: {
-    filename: './client/client.js'
+    filename: './build/client/client.js'
   },
   resolve: {
     extensions: ['', '.webpack.js', '.ts', '.tsx', '.js'],

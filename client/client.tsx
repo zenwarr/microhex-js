@@ -4,7 +4,7 @@ import {connect, Provider} from 'react-redux';
 import {initMenu} from './menu';
 import * as classNames from 'classnames';
 import * as Actions from './actions';
-import {StoreManager, DevTools} from './store';
+import {StoreManager} from './store';
 import * as Immutable from 'immutable';
 
 initMenu();
@@ -105,15 +105,29 @@ const StateTabs = connect((state:Immutable.Map<string, any>) => {
   }
 })(Tabs);
 
+let application_jsx:JSX.Element;
+
+if (process.env.NODE_ENV === 'production') {
+  application_jsx = (
+    <div className='working-area'>
+      <StateTabs />
+    </div>
+  );
+} else {
+  let DevTools = require('./store-dev').DevTools;
+
+  application_jsx = (
+    <div className='working-area'>
+      <StateTabs />
+
+      <DevTools />
+    </div>
+  );
+}
+
 class Application extends React.Component<any, any> {
   render():JSX.Element {
-    return (
-      <div className='working-area'>
-        <StateTabs />
-
-        <DevTools />
-      </div>
-    );
+    return application_jsx;
   }
 }
 

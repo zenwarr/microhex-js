@@ -2,17 +2,13 @@ import * as Redux from 'redux';
 import * as Actions from './actions';
 import * as State from './state';
 import * as Immutable from 'immutable';
-import * as React from 'react';
 
-import { createDevTools } from 'redux-devtools';
-import LogMonitor from 'redux-devtools-log-monitor';
-import DockMonitor from 'redux-devtools-dock-monitor';
+let store_enchancer;
 
-export const DevTools = createDevTools(
-  <DockMonitor toggleVisibilityKey='ctrl-h' changePositionKey='ctrl-q' defaultIsVisible={true}>
-    <LogMonitor theme='tomorrow' />
-  </DockMonitor>
-);
+if (process.env.NODE_ENV !== 'production') {
+  let store_dev = require('./store-dev');
+  store_enchancer = store_dev.DevTools.instrument();
+}
 
 export class StoreManager {
   protected static _instance:StoreManager = null;
@@ -36,7 +32,7 @@ export class StoreManager {
       }
     };
 
-    this._store = Redux.createStore(applicationReducer, State.initialState, DevTools.instrument());
+    this._store = Redux.createStore(applicationReducer, State.initialState, store_enchancer);
   }
 
   static get instance():StoreManager {

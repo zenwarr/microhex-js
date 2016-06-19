@@ -8,11 +8,10 @@
     "noFallthroughCasesInSwitch": true,
     "noEmitOnError": true,
     "jsx": "react",
-    "outDir": "build"
+    "outDir": "build-ts"
   },
   "exclude": [
     "build",
-    "client",
     "node_modules",
     "webpack"
   ],

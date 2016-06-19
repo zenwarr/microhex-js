@@ -1,7 +1,7 @@
 .idea
-client
 node_modules
 build
+build-ts
 typings
 todo.md
 src/**/*.js

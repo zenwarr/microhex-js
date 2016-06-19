@@ -11,7 +11,7 @@ Electron.app.on('ready', function() {
   });
 
   mainWindow.setMenu(null);
-  mainWindow.webContents.loadURL(`file://${__dirname}/../client/index.html`);
+  mainWindow.webContents.loadURL(`file://${__dirname}/client/index.html`);
 
   mainWindow.on('close', function() {
     mainWindow = null;
