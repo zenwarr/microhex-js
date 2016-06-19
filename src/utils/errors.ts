@@ -17,7 +17,7 @@ export enum ErrorCode {
 export class NError extends Error implements ICustomError {
   constructor(public ex_class:ICustomError, public code:ErrorCode, message:string, public cause:Error = null) {
     super(message);
-    Error['captureStackTrace'](this, ex_class);
+    Error.captureStackTrace(this, ex_class as Function);
   }
 
   get detailed():string {
