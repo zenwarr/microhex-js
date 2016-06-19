@@ -8,13 +8,21 @@
   },
   "license": "MIT",
   "description": "Crossplatform hex editor intended mainly for reverse-engineering and data analysis",
-  "keywords": ["editor", "hex", "binary", "microhex", "microhex-js", "zenwarr"],
+  "keywords": [
+    "editor",
+    "hex",
+    "binary",
+    "microhex",
+    "microhex-js",
+    "zenwarr"
+  ],
   "author": "Victor Tyazhelnikov",
   "engines": {
     "node": ">=6.0.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "enzyme": "^2.3.0",
     "gulp": "^3.9.1",
     "gulp-stylus": "^2.3.1",
     "gulp-typescript": "^2.13.0",
