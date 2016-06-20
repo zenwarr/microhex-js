@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {expect} from 'chai';
 import {shallow} from 'enzyme';
-import {HexCellComponent, HexComponent} from '../../../client/hex/index';
+import {HexCellComponent, HexComponent} from '../../client/hex/index';
 
 describe('<HexCellComponent />', function() {
   it('renders hex-cell', function() {

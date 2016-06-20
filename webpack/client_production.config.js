@@ -1,11 +1,13 @@
 var webpack = require('webpack');
 var webpack_common = require('./common');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 var options = {
-  entry: './client/client.tsx',
+  entry: './src/client/client.tsx',
   target: 'electron-renderer',
   output: {
-    filename: './build/client/client.js'
+    path: 'build/client',
+    filename: 'client.js'
   },
   resolve: {
     extensions: ['', '.webpack.js', '.ts', '.tsx', '.js'],
@@ -16,10 +18,17 @@ var options = {
       {
         test: /\.ts[x]?$/,
         loader: 'ts-loader'
+      },
+      {
+        test: /\.scss$/,
+        loaders: ["style", "css", "sass"]
       }
     ]
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      title: 'Microhex'
+    }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production')
     }),

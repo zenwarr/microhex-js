@@ -7,6 +7,8 @@ import * as Actions from './actions';
 import {StoreManager} from './store';
 import * as Immutable from 'immutable';
 
+require('../styles/style.scss');
+
 initMenu();
 
 interface ITabProps {
@@ -130,6 +132,11 @@ class Application extends React.Component<any, any> {
     return application_jsx;
   }
 }
+
+// add #app to body
+let app:Element = document.createElement('div');
+app.setAttribute('id', 'app');
+document.body.insertBefore(app, document.body.firstChild);
 
 ReactDOM.render(<Provider store={StoreManager.instance.store}><Application /></Provider>, document.getElementById('app'));
 
