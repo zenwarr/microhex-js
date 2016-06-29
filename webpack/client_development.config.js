@@ -7,7 +7,7 @@ var options = {
   target: 'electron-renderer',
   output: {
     path: 'build/client',
-    filename: 'client/client.js'
+    filename: 'client.js'
   },
   resolve: {
     extensions: ['', '.webpack.js', '.ts', '.tsx', '.js'],

@@ -5,6 +5,8 @@
     "classnames": "registry:dt/classnames#0.0.0+20160316155526",
     "enzyme": "registry:dt/enzyme#2.3.0+20160525083955",
     "github-electron": "registry:dt/github-electron#1.2.3+20160619034813",
+    "jquery": "registry:dt/jquery#1.10.0+20160620094458",
+    "jsdom": "registry:dt/jsdom#2.0.0+20160316155526",
     "mocha": "registry:dt/mocha#2.2.5+20160619032855",
     "node": "registry:dt/node#6.0.0+20160613154055",
     "react": "registry:dt/react#0.14.0+20160602151522",

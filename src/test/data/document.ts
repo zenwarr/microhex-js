@@ -1,21 +1,21 @@
 import { expect } from 'chai';
-import { Document } from '../../data/document';
+import { DataDocument } from '../../data/document';
 import { AbstractDataSource, BufferDataSource } from '../../data/source';
 import { check_read } from './_common';
 
-describe('Document', function() {
-  let doc:Document, source:AbstractDataSource;
+describe('DataDocument', function() {
+  let doc:DataDocument, source:AbstractDataSource;
 
   beforeEach(function() {
     source = new BufferDataSource(new Buffer('0123456789'));
-    doc = new Document(source);
+    doc = new DataDocument(source);
   });
 
   describe('ctor', function() {
-    let doc:Document;
+    let doc:DataDocument;
 
     beforeEach(function() {
-      doc = new Document();
+      doc = new DataDocument();
     });
 
     it('should initially have zero length', function() {

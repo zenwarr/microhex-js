@@ -15,17 +15,26 @@ export class StoreManager {
   protected _store:Redux.Store;
 
   constructor() {
-    let applicationReducer:Redux.Reducer = function(state:Immutable.Map<string, any> = State.initialState,
+    let applicationReducer:Redux.Reducer = function(state:State.ApplicationState = State.initialState,
                                                     action:Actions.IBasic):Immutable.Map<string, any> {
       switch (action.type) {
         case Actions.ADD_TAB:
-          return state.setIn(['tabs'], state.get('tabs').push((action as Actions.IAddTab).tabData));
+          return state.set('tabs', state.tabs.push((action as Actions.IAddTab).tabState));
 
         case Actions.REMOVE_TAB:
-          return state.setIn(['tabs'], state.get('tabs').filter(x => x.id !== (action as Actions.IRemoveTab).tabId));
+          return state.set('tabs', state.tabs.filter(x => x.id !== (action as Actions.IRemoveTab).tabId));
 
         case Actions.ACTIVATE_TAB:
           return state.set('currentTabId', (action as Actions.IActivateTab).tabId);
+
+        case Actions.CLOSE_ACTIVE_TAB:
+          return state.set('tabs', state.tabs.filter(x => x.id !== state.currentTabId));
+
+        case Actions.ADD_EDITOR:
+          return state.set('editors', state.editors.push((action as Actions.IAddEditor).editorState));
+
+        case Actions.REMOVE_EDITOR:
+          return state.set('editors', state.editors.filter(x => x.id !== (action as Actions.IRemoveEditor).editorId));
 
         default:
           return state;

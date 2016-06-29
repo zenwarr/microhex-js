@@ -1,6 +1,7 @@
 import * as Electron from 'electron';
 import {StoreManager} from './store';
 import * as Actions from './actions';
+import {Application} from './application';
 
 const Menu = Electron.remote.Menu;
 
@@ -12,9 +13,17 @@ const menu_template = [
       {
         label: 'Open',
         click: function(menuItem:Electron.MenuItem, browserWindow:Electron.BrowserWindow):void {
-          StoreManager.instance.store.dispatch({
-            type: Actions.OPEN_FILE__REQUEST
-          } as Actions.IBasic);
+          Electron.remote.dialog.showOpenDialog(browserWindow, {
+            title: 'Open file',
+            filters: [
+              { name: 'All files', extensions: ['*'] }
+            ],
+            properties: ['openFile']
+          }, (filenames:string[]) => {
+            if (filenames.length > 0) {
+              Application.instance.openFile(filenames[0], 'r');
+            }
+          });
         }
       },
       {

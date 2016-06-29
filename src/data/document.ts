@@ -4,7 +4,7 @@ import { AbstractDataSource } from './source';
 import { AbstractSpan, SourceSpan } from './spans';
 import { Chain } from './chain';
 
-export class Document extends AbstractReadable {
+export class DataDocument extends AbstractReadable {
   protected _chain:Chain;
 
   constructor(protected _source:AbstractDataSource = null) {

@@ -212,7 +212,7 @@ export abstract class AbstractCodec {
   /**
    * Acts as decodeFromBuffer, but gets data from stream instead.
    * @param stream Stream to read from.
-   * @param unitLimit Maximal number of units to decode. 0 means no limit.
+   * @param unitLimit See decodeFromBuffer method documentation for details about this parameter.
    */
   abstract decode(stream:DataReadStream, unitLimit:number):Promise<IDecodeResult[]>;
 

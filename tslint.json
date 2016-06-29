@@ -16,7 +16,7 @@
     "no-duplicate-variable": true,
     "no-eval": true,
     "no-shadowed-variable": true,
-    "no-switch-case-fall-through": true,
+    "no-switch-case-fall-through": false,
     "no-unused-expression": true,
     "no-unused-variable": true,
     "no-unreachable": true,
