@@ -5,7 +5,7 @@ import {HexColumnType} from '../hex/index';
 
 let ApplicationStateRecord = Immutable.Record({
   tabs: Immutable.List<TabState>(),
-  currentTabId: 0,
+  currentTabId: -1,
   editors: Immutable.List<EditorState>(),
 });
 

@@ -12,36 +12,48 @@ if (process.env.NODE_ENV !== 'production') {
 
 export class StoreManager {
   protected static _instance:StoreManager = null;
+  protected static _reducer:Redux.Reducer = null;
   protected _store:Redux.Store;
 
   constructor() {
-    let applicationReducer:Redux.Reducer = function(state:State.ApplicationState = State.initialState,
-                                                    action:Actions.IBasic):Immutable.Map<string, any> {
-      switch (action.type) {
-        case Actions.ADD_TAB:
-          return state.set('tabs', state.tabs.push((action as Actions.IAddTab).tabState));
+    this._store = Redux.createStore(StoreManager.applicationReducer, State.initialState, store_enchancer);
+  }
 
-        case Actions.REMOVE_TAB:
-          return state.set('tabs', state.tabs.filter(x => x.id !== (action as Actions.IRemoveTab).tabId));
+  static get applicationReducer():Redux.Reducer {
+    if (StoreManager._reducer == null) {
+      StoreManager._reducer = function(state:State.ApplicationState = State.initialState,
+                                                      action:Actions.IBasic):Immutable.Map<string, any> {
+        switch (action.type) {
+          case Actions.ADD_TAB: {
+            let new_state:Immutable.Map<string, any> = state.set('tabs',
+                                    state.tabs.push(new State.TabState((action as Actions.IAddTab).tabState)));
+            if (new_state.get('currentTabId') < 0) {
+              new_state = new_state.set('currentTabId', new_state.get('tabs').get(0).id);
+            }
+            return new_state;
+          }
 
-        case Actions.ACTIVATE_TAB:
-          return state.set('currentTabId', (action as Actions.IActivateTab).tabId);
+          case Actions.REMOVE_TAB:
+            return state.set('tabs', state.tabs.filter(x => x.id !== (action as Actions.IRemoveTab).tabId));
 
-        case Actions.CLOSE_ACTIVE_TAB:
-          return state.set('tabs', state.tabs.filter(x => x.id !== state.currentTabId));
+          case Actions.ACTIVATE_TAB:
+            return state.set('currentTabId', (action as Actions.IActivateTab).tabId);
 
-        case Actions.ADD_EDITOR:
-          return state.set('editors', state.editors.push((action as Actions.IAddEditor).editorState));
+          case Actions.CLOSE_ACTIVE_TAB:
+            return state.set('tabs', state.tabs.filter(x => x.id !== state.currentTabId));
 
-        case Actions.REMOVE_EDITOR:
-          return state.set('editors', state.editors.filter(x => x.id !== (action as Actions.IRemoveEditor).editorId));
+          case Actions.ADD_EDITOR:
+            return state.set('editors', state.editors.push(new State.EditorState((action as Actions.IAddEditor).editorState)));
 
-        default:
-          return state;
-      }
-    };
+          case Actions.REMOVE_EDITOR:
+            return state.set('editors', state.editors.filter(x => x.id !== (action as Actions.IRemoveEditor).editorId));
 
-    this._store = Redux.createStore(applicationReducer, State.initialState, store_enchancer);
+          default:
+            return state;
+        }
+      };
+    }
+    return StoreManager._reducer;
   }
 
   static get instance():StoreManager {

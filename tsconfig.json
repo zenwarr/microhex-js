@@ -8,7 +8,8 @@
     "noFallthroughCasesInSwitch": true,
     "noEmitOnError": true,
     "jsx": "react",
-    "outDir": "build"
+    "outDir": "build",
+    "allowJs": true
   },
   "exclude": [
     "build",
