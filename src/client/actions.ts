@@ -11,7 +11,7 @@ export const OPEN_FILE__SUCCESS = 'OPEN_FILE:SUCCESS';
 export const OPEN_FILE__FAIL = 'OPEN_FILE:FAIL';
 
 export const ADD_TAB = 'ADD_TAB';
-export const CLOSE_ACTIVE_TAB = 'CLOSE_ACTIVE_TAB';
+export const REMOVE_ACTIVE_TAB = 'REMOVE_ACTIVE_TAB';
 export const REMOVE_TAB = 'REMOVE_TAB';
 export const ACTIVATE_TAB = 'ACTIVATE_TAB';
 

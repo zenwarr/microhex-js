@@ -30,7 +30,7 @@ const menu_template = [
         label: 'Close',
         click: function(menuItem:Electron.MenuItem, browserWindow:Electron.BrowserWindow):void {
           StoreManager.instance.store.dispatch({
-            type: Actions.CLOSE_ACTIVE_TAB
+            type: Actions.REMOVE_ACTIVE_TAB
           } as Actions.IBasic);
         }
       }

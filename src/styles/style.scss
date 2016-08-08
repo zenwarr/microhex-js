@@ -2,6 +2,14 @@ $font-editor: "Monaco", "Fira Mono", "Consolas", "Ubuntu Mono", "Courier New", "
 $font-ui: "Segoe UI", "serif";
 
 $color-tab-active: #222;
+$color-element-foreground: #666;
+$color-element-active-foreground: #ccc;
+
+$images-prefix: "../../resources/img/";
+
+@function image-path($filename) {
+  @return $images-prefix + $filename
+}
 
 body {
   margin: 0;
@@ -9,6 +17,23 @@ body {
   background: black;
   color: white;
   font-family: $font-ui;
+}
+
+svg {
+  display: block;
+}
+
+.btn {
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  appearance: none;
+  background: none;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .tabs {
@@ -24,15 +49,39 @@ body {
   }
 }
 
+$close-icon-size: 8px;
+$close-icon-margin: 10px;
+
 .tab {
   width: 200px;
   padding: 10px;
+  padding-right: $close-icon-margin * 2 + $close-icon-size;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: default;
+  position: relative;
 
   &--active {
     background: $color-tab-active;
+  }
+
+  &__close {
+    position: absolute;
+    right: $close-icon-margin;
+    top: 50%;
+    margin-top: -($close-icon-size / 2);
+    width: $close-icon-size;
+    height: $close-icon-size;
+  }
+}
+
+.btn-close {
+  &__path {
+    fill: $color-element-foreground;
+  }
+
+  &:hover .btn-close__path {
+    fill: $color-element-active-foreground;
   }
 }

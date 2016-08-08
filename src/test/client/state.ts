@@ -77,7 +77,7 @@ describe('Action.ADD_TAB', function() {
       currentTabId: 0,
       editors: Immutable.List()
     }));
-  })
+  });
 });
 
 describe('Action.REMOVE_TAB', function() {
@@ -114,6 +114,112 @@ describe('Action.REMOVE_TAB', function() {
       ]),
       currentTabId: -1,
       editors: Immutable.List()
+    }));
+  });
+
+  it('should remove a corresponding editor too', function() {
+    let st:State.ApplicationState = new State.ApplicationState({
+      tabs: Immutable.List([
+        new State.TabState({
+          id: 0,
+          title: 'test title',
+          editorId: 10
+        }),
+        new State.TabState({
+          id: 1,
+          title: 'another tab',
+          editorId: 20
+        })
+      ]),
+      currentTabId: 0,
+      editors: Immutable.List([
+        new State.EditorState({
+          id: 10,
+          document: null,
+          columns: Immutable.List<State.ColumnState>()
+        }),
+        new State.EditorState({
+          id: 20,
+          document: null,
+          columns: Immutable.List<State.ColumnState>()
+        })
+      ])
+    });
+
+    st = (StoreManager.applicationReducer)(st, {
+      type: Actions.REMOVE_TAB,
+      tabId: 1
+    });
+
+    expect(st).equals(new State.ApplicationState({
+      tabs: Immutable.List([
+        new State.TabState({
+          id: 0,
+          title: 'test title',
+          editorId: 10
+        })
+      ]),
+      currentTabId: 0,
+      editors: Immutable.List([
+        new State.EditorState({
+          id: 10,
+          document: null,
+          columns: Immutable.List<State.ColumnState>()
+        })
+      ])
+    }));
+  });
+
+  it('should activate another tab when current one is closed', function() {
+    let st:State.ApplicationState = new State.ApplicationState({
+      tabs: Immutable.List([
+        new State.TabState({
+          id: 0,
+          title: 'test title',
+          editorId: 10
+        }),
+        new State.TabState({
+          id: 1,
+          title: 'another tab',
+          editorId: 20
+        })
+      ]),
+      currentTabId: 0,
+      editors: Immutable.List([
+        new State.EditorState({
+          id: 10,
+          document: null,
+          columns: Immutable.List<State.ColumnState>()
+        }),
+        new State.EditorState({
+          id: 20,
+          document: null,
+          columns: Immutable.List<State.ColumnState>()
+        })
+      ])
+    });
+
+    st = (StoreManager.applicationReducer)(st, {
+      type: Actions.REMOVE_TAB,
+      tabId: 1
+    });
+
+    expect(st).equals(new State.ApplicationState({
+      tabs: Immutable.List([
+        new State.TabState({
+          id: 0,
+          title: 'test title',
+          editorId: 10
+        })
+      ]),
+      currentTabId: 0,
+      editors: Immutable.List([
+        new State.EditorState({
+          id: 10,
+          document: null,
+          columns: Immutable.List<State.ColumnState>()
+        })
+      ])
     }));
   });
 });

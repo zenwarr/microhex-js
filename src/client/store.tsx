@@ -19,14 +19,53 @@ export class StoreManager {
     this._store = Redux.createStore(StoreManager.applicationReducer, State.initialState, store_enchancer);
   }
 
+  static removeTabReducer(state:State.ApplicationState, action:Actions.IRemoveTab):State.ApplicationState {
+    let tab_index:number, tab_state:State.TabState;
+    [tab_index, tab_state] = state.get('tabs').findEntry((ts:State.TabState) => {
+      return ts.id === action.tabId;
+    }) as [number, State.TabState];
+
+    if (tab_state == null) {
+      // if tab with this id is not found
+      return state;
+    } else {
+      // remove TabState
+      let new_state = state.set('tabs', state.tabs.filter((ts:State.TabState) => {
+        return ts.id !== action.tabId;
+      })) as State.ApplicationState;
+
+      // and remove EditorState removed TabState refers to
+      new_state = new_state.set('editors', new_state.editors.filter((es:State.EditorState) => {
+        console.log('es.id =', es.id, ' tab_state.editorId =', tab_state.editorId);
+        return es.id !== tab_state.editorId;
+      })) as State.ApplicationState;
+
+      // also, when active tab is being removed, activate another tab
+      if (state.currentTabId === tab_state.id) {
+        if (tab_index > 0) {
+          // activate a tab to the left, if there is any
+          new_state = new_state.set('currentTabId', state.tabs.get(tab_index - 1).id) as State.ApplicationState;
+        } else if (state.tabs.size > 1) {
+          // activate a tab to the right, if there is any
+          new_state = new_state.set('currentTabId', state.tabs.get(tab_index + 1).id) as State.ApplicationState;
+        } else {
+          // no other tabs, set current tab to -1
+          new_state = new_state.set('currentTabId', -1) as State.ApplicationState;
+        }
+      }
+
+      return new_state;
+    }
+  }
+
   static get applicationReducer():Redux.Reducer {
     if (StoreManager._reducer == null) {
       StoreManager._reducer = function(state:State.ApplicationState = State.initialState,
                                                       action:Actions.IBasic):Immutable.Map<string, any> {
         switch (action.type) {
           case Actions.ADD_TAB: {
-            let new_state:Immutable.Map<string, any> = state.set('tabs',
-                                    state.tabs.push(new State.TabState((action as Actions.IAddTab).tabState)));
+            let new_state = state.set('tabs',
+                                      state.tabs.push(new State.TabState((action as Actions.IAddTab).tabState)));
             if (new_state.get('currentTabId') < 0) {
               new_state = new_state.set('currentTabId', new_state.get('tabs').get(0).id);
             }
@@ -34,13 +73,25 @@ export class StoreManager {
           }
 
           case Actions.REMOVE_TAB:
-            return state.set('tabs', state.tabs.filter(x => x.id !== (action as Actions.IRemoveTab).tabId));
+            return StoreManager.removeTabReducer(state, action as Actions.IRemoveTab);
 
-          case Actions.ACTIVATE_TAB:
-            return state.set('currentTabId', (action as Actions.IActivateTab).tabId);
+          case Actions.REMOVE_ACTIVE_TAB:
+            return StoreManager.removeTabReducer(state, {
+              type: Actions.REMOVE_TAB,
+              tabId: state.currentTabId
+            } as Actions.IRemoveTab);
 
-          case Actions.CLOSE_ACTIVE_TAB:
-            return state.set('tabs', state.tabs.filter(x => x.id !== state.currentTabId));
+          case Actions.ACTIVATE_TAB: {
+            let q_action = action as Actions.IActivateTab;
+
+            // first check if a tab with this is exists; if not, do not change anything
+            let tab_index:number = state.tabs.findKey((ts:State.TabState) => ts.id === q_action.tabId);
+            if (tab_index >= 0) {
+              return state.set('currentTabId', q_action.tabId);
+            } else {
+              return state;
+            }
+          }
 
           case Actions.ADD_EDITOR:
             return state.set('editors', state.editors.push(new State.EditorState((action as Actions.IAddEditor).editorState)));
