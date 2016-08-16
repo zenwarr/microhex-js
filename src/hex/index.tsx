@@ -20,8 +20,8 @@ export class HexComponent extends React.Component<IHexProps, void> {
   render() {
     return (
       <div className='hex'>
-        {this.props.columns.map(column_state => <HexColumn {...column_state}
-          document={this.props.document} />)}
+        {this.props.columns.map((column_state, index) => <HexColumn {...column_state}
+          document={this.props.document} key={index} />)}
       </div>
     );
   }
@@ -52,6 +52,9 @@ export interface IHexRowData {
 
 }
 
+/*
+ * Renders row of data inside a hex component
+ */
 export class HexRow extends React.Component<IHexRowData, void> {
   render() {
     return (
@@ -62,6 +65,9 @@ export class HexRow extends React.Component<IHexRowData, void> {
   }
 }
 
+/*
+ * All supported column types should be listed here
+ */
 export enum HexColumnType {
   EMPTY,
   INTEGER
@@ -74,8 +80,8 @@ export interface IHexColumnProps {
 }
 
 /**
- * Hex editor widget consists of columns. Each column can have its own settings and codec to display data.
- * Column renders its header with title and controls and data area that actually displays data.
+ * An hex editor widget consists of columns. Each column can have its own settings and a codec to display data.
+ * A column renders its header with a title, controls and a data area that actually displays data.
  */
 export class HexColumn<T extends IHexColumnProps> extends React.Component<T, void> {
   static defaultProps:IHexColumnProps = {
@@ -107,12 +113,15 @@ export class HexColumn<T extends IHexColumnProps> extends React.Component<T, voi
   }
 }
 
-export abstract class HexColumnData<T extends IHexColumnProps, S> extends React.Component<T, S> {
-
-}
-
 export interface IHexCodecColumnDataProps extends IHexColumnProps {
   codec?:AbstractCodec;
+}
+
+/*
+ * A component to display data inside a hex column
+ */
+export abstract class HexColumnData<T extends IHexColumnProps, S> extends React.Component<T, S> {
+
 }
 
 export interface IHexCodecColumnDataState {
@@ -121,6 +130,9 @@ export interface IHexCodecColumnDataState {
   loadError?:Error;
 }
 
+/*
+ * A specialized column to show data from decoded by a codec.
+ */
 export abstract class HexCodecColumnData<T extends IHexCodecColumnDataProps> extends HexColumnData<T, IHexCodecColumnDataState> {
   constructor() {
     super();
@@ -144,7 +156,7 @@ export abstract class HexCodecColumnData<T extends IHexCodecColumnDataProps> ext
         });
       }).catch((err:Error) => {
         this.setState({
-          loadError: new Errors.IO(null, err)
+          loadError: new Errors.IO(err.message, err)
         });
       });
     }
@@ -175,19 +187,28 @@ export interface IHexFixedCellColumnDataProps extends IHexCodecColumnDataProps {
   rowBinaryLength?:number;
 }
 
+/*
+ * A specialized column to show data from a codec with fixed unit width
+ */
 export abstract class HexFixedCellColumnData<T extends IHexFixedCellColumnDataProps> extends HexCodecColumnData<T> {
   _doRender():JSX.Element {
-    let rows:JSX.Element[];
+    let rows:JSX.Element[] = [];
 
     let cur_cache_index = 0;
-    for (let j = 0; j < this.state.dataCache.length / this.props.rowBinaryLength; ++j) {
+    let rows_count = Math.floor(this.state.dataCache.length / this.props.rowBinaryLength);
+    if (this.state.dataCache.length % this.props.rowBinaryLength > 0) {
+      ++rows_count;
+    }
+    for (let j = 0; j < rows_count; ++j) {
       let cells:JSX.Element[] = [];
 
-      for (let c = 0; c < this.props.rowBinaryLength; c += this.state.dataCache[cur_cache_index].binaryLength) {
-        cells.push(<HexCell text={this._toText(this.state.dataCache[cur_cache_index])} />);
+      for (let c = 0; c < this.props.rowBinaryLength && cur_cache_index < this.state.dataCache.length; ++cur_cache_index) {
+        let cache_item = this.state.dataCache[cur_cache_index];
+        cells.push(<HexCell text={this._toText(cache_item)} key={c} />);
+        c += cache_item.binaryLength;
       }
 
-      rows.push(<HexRow>{cells}</HexRow>);
+      rows.push(<HexRow key={j}>{cells}</HexRow>);
     }
 
     return (
@@ -198,7 +219,11 @@ export abstract class HexFixedCellColumnData<T extends IHexFixedCellColumnDataPr
   }
 
   _toText(dr:IDecodeResult):string {
-    return '' + dr.result;
+    let res = '' + dr.result;
+    if (res.length < 3) {
+      res = new Array(3 - res.length + 1).join('0') + res;
+    }
+    return res;
   }
 }
 
@@ -206,6 +231,9 @@ export interface IHexIntegerColumnDataProps extends IHexFixedCellColumnDataProps
   // formatter:IntegerFormatter;
 }
 
+/*
+ * A specialized component to show data from IntegerCodec
+ */
 export class HexIntegerColumnData extends HexFixedCellColumnData<IHexIntegerColumnDataProps> {
   static defaultProps:IHexIntegerColumnDataProps = {
     title:'',

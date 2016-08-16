@@ -6,7 +6,11 @@ import {StoreManager} from './store';
 import {IHexProps} from '../hex/index';
 import {StateTabs} from './tabs';
 
-require('../styles/style.scss');
+try {
+  require('../styles/style.scss');
+} catch (err) {
+  ;
+}
 
 initMenu();
 
@@ -59,4 +63,3 @@ app.setAttribute('id', 'app');
 document.body.insertBefore(app, document.body.firstChild);
 
 ReactDOM.render(<Provider store={StoreManager.instance.store}><Application /></Provider>, document.getElementById('app'));
-

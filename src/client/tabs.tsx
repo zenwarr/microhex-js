@@ -3,7 +3,8 @@ import * as Actions from './actions';
 import * as State from './state';
 import {connect} from 'react-redux';
 import * as classNames from 'classnames';
-import {HexComponent} from '../hex/index';
+import {HexComponent, IHexIntegerColumnDataProps, HexColumnType} from '../hex/index';
+import {IntegerCodec, IntegerFormat} from '../data/codecs';
 
 export interface ITabProps {
   id:number;
@@ -102,7 +103,13 @@ export const StateTabs = connect((state:State.ApplicationState) => {
         id: td.id,
         title: td.title,
         content: editor == null ? null : (
-          <HexComponent document={editor.document} columns={[]} />
+          <HexComponent document={editor.document} columns={[{
+            title: "Hex:1u",
+            document: editor.document,
+            columnType: HexColumnType.INTEGER,
+            codec: new IntegerCodec(IntegerFormat.Format8Bit, false),
+            rowBinaryLength: 16
+          } as IHexIntegerColumnDataProps]} />
         )
       };
     }).toJS(),
@@ -119,6 +126,6 @@ export const StateTabs = connect((state:State.ApplicationState) => {
     return {
       type: Actions.REMOVE_TAB,
       tabId: tabId
-    }
+    };
   }
 })(Tabs);

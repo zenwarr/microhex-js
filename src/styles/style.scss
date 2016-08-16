@@ -85,3 +85,12 @@ $close-icon-margin: 10px;
     fill: $color-element-active-foreground;
   }
 }
+
+.hex-cell {
+  display: inline-block;
+  margin-right: 10px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+}

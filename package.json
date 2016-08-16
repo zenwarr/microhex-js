@@ -61,6 +61,7 @@
     "prebuild-tests": "typings install",
     "build-tests": "webpack --config ./webpack/tests.config.js",
     "test": "mocha ./build/test/ --recursive",
-    "build-and-test": "npm run build-tests && npm test"
+    "build-and-test": "npm run build-tests && npm test",
+    "build-dev-styles": "node-sass src/styles/style.scss build/styles/style.css"
   }
 }
