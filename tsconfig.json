@@ -6,7 +6,7 @@
     "noImplicitUseStrict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "jsx": "react",
     "outDir": "build",
     "allowJs": true
