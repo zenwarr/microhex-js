@@ -18,7 +18,7 @@ interface IWorkingAreaState {
   editors?:IHexProps[];
 }
 
-class WorkingArea extends React.Component<IWorkingAreaState, void> {
+class WorkingArea extends React.Component<IWorkingAreaState> {
   static defaultProps:IWorkingAreaState = {
     editors: []
   };

@@ -12,8 +12,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 export class StoreManager {
   protected static _instance:StoreManager = null;
-  protected static _reducer:Redux.Reducer = null;
-  protected _store:Redux.Store;
+  protected static _reducer:Redux.Reducer<any> = null;
+  protected _store:Redux.Store<any>;
 
   constructor() {
     this._store = Redux.createStore(StoreManager.applicationReducer, State.initialState, store_enchancer);
@@ -58,7 +58,7 @@ export class StoreManager {
     }
   }
 
-  static get applicationReducer():Redux.Reducer {
+  static get applicationReducer():Redux.Reducer<any> {
     if (StoreManager._reducer == null) {
       StoreManager._reducer = function(state:State.ApplicationState = State.initialState,
                                                       action:Actions.IBasic):Immutable.Map<string, any> {
@@ -115,5 +115,5 @@ export class StoreManager {
     return StoreManager._instance;
   }
 
-  get store():Redux.Store { return this._store; }
+  get store():Redux.Store<any> { return this._store; }
 }

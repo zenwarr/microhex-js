@@ -1,22 +1,25 @@
+const path = require('path');
 var webpack = require('webpack');
 var webpack_common = require('./common');
 
-module.exports = {
+module.exports = env => ({
   entry: './src/app.ts',
   output: {
-    filename: './build/app.js'
+    filename: 'app.js',
+    path: path.join(__dirname, '../build')
   },
-  target: 'electron',
+  target: 'electron-main',
+  mode: env.prod === true ? 'production' : 'development',
   externals: [webpack_common.build_externals()],
   node: {
     __dirname: false,
     __filename: false
   },
   resolve: {
-    extensions: ['', '.webpack.js', '.ts', '.js']
+    extensions: ['.webpack.js', '.ts', '.js']
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.ts$/,
         loader: 'ts-loader'
@@ -31,4 +34,4 @@ module.exports = {
     //   sourceMap: false
     // }) // for now, UglifyJS does not support es6, so we do not minimize code for production
   ]
-};
+});

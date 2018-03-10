@@ -1,16 +1,23 @@
-import {jsdom} from 'jsdom';
+import { JSDOM } from 'jsdom';
 
-let exposedProperties = ['window', 'navigator', 'document'];
+const dom = new JSDOM('');
 
-global['document'] = jsdom('');
-global['window'] = document.defaultView;
-Object.keys(document.defaultView).forEach((property) => {
+global['window'] = dom.window;
+global['document'] = dom.window.document;
+
+Object.keys(dom).forEach((property) => {
   if (typeof global[property] === 'undefined') {
-    exposedProperties.push(property);
-    global[property] = document.defaultView[property];
+    global[property] = dom[property];
   }
 });
 
 global['navigator'] = {
   userAgent: 'node.js'
 };
+
+const configure = require('enzyme').configure;
+const Adapter = require('enzyme-adapter-react-16');
+
+configure({
+  adapter: new Adapter()
+});

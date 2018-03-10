@@ -11,7 +11,7 @@ export interface IHexProps {
 /**
  * Renders main hex widget containing of columns
  */
-export class HexComponent extends React.Component<IHexProps, void> {
+export class HexComponent extends React.Component<IHexProps> {
   static defaultProps:IHexProps = {
     document: null,
     columns: []
@@ -34,7 +34,7 @@ interface IHexCellProps {
 /**
  * Single cell of hex editor
  */
-export class HexCell extends React.Component<IHexCellProps, void> {
+export class HexCell extends React.Component<IHexCellProps> {
   static defaultProps:IHexCellProps = {
     text: ''
   };
@@ -55,7 +55,7 @@ export interface IHexRowData {
 /*
  * Renders row of data inside a hex component
  */
-export class HexRow extends React.Component<IHexRowData, void> {
+export class HexRow extends React.Component<IHexRowData> {
   render() {
     return (
       <div className='hex-row'>
@@ -83,7 +83,7 @@ export interface IHexColumnProps {
  * An hex editor widget consists of columns. Each column can have its own settings and a codec to display data.
  * A column renders its header with a title, controls and a data area that actually displays data.
  */
-export class HexColumn<T extends IHexColumnProps> extends React.Component<T, void> {
+export class HexColumn<T extends IHexColumnProps> extends React.Component<T> {
   static defaultProps:IHexColumnProps = {
     title: '<untitled>',
     document: null,
@@ -134,8 +134,8 @@ export interface IHexCodecColumnDataState {
  * A specialized column to show data from decoded by a codec.
  */
 export abstract class HexCodecColumnData<T extends IHexCodecColumnDataProps> extends HexColumnData<T, IHexCodecColumnDataState> {
-  constructor() {
-    super();
+  constructor(props: T) {
+    super(props);
     this.state = {
       dataLoaded: false,
       dataCache:[],
@@ -247,7 +247,7 @@ interface IHexColumnHeaderProps {
   text:string;
 }
 
-export class HexColumnHeader extends React.Component<IHexColumnHeaderProps, void> {
+export class HexColumnHeader extends React.Component<IHexColumnHeaderProps> {
   static defaultProps:IHexColumnHeaderProps = {
     text: '<untitled>'
   };

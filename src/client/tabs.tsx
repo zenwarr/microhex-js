@@ -11,11 +11,11 @@ export interface ITabProps {
   title:string;
   content?:JSX.Element;
   isActive?:boolean;
-  onClick?:(e:React.MouseEvent) => void;
-  onClose?:(e:React.MouseEvent) => void;
+  onClick?:(e:React.MouseEvent<Element>) => void;
+  onClose?:(e:React.MouseEvent<Element>) => void;
 }
 
-export class Tab extends React.Component<ITabProps, void> {
+export class Tab extends React.Component<ITabProps> {
   render():JSX.Element {
     let classes = classNames({
       'tab': true,
@@ -35,7 +35,7 @@ export class Tab extends React.Component<ITabProps, void> {
     );
   }
 
-  handleClick(e:React.MouseEvent) {
+  handleClick(e:React.MouseEvent<Element>) {
     let element_target = e.target as Element;
     if (!element_target.classList.contains('tab__close')) {
       this.props.onClick(e);
@@ -55,20 +55,18 @@ export class Tab extends React.Component<ITabProps, void> {
 export interface ITabsProps {
   tabList:ITabProps[];
   currentTabId:number;
-  onTabClick:(tabId:number)=>void;
-  onTabClose:(tabId:number)=>void;
+  onTabClick:(tabId:number)=>Actions.IActivateTab;
+  onTabClose:(tabId:number)=>Actions.IRemoveTab;
 }
 
-export class Tabs extends React.Component<ITabsProps, void> {
+export class Tabs extends React.Component<ITabsProps> {
   constructor(props:ITabsProps) {
     super(props);
   }
 
-  static defaultProps:ITabsProps = {
+  static defaultProps = {
     tabList: [],
-    currentTabId: -1,
-    onTabClick: (tabId:number) => {},
-    onTabClose: (tabId:number) => {}
+    currentTabId: -1
   };
 
   render():JSX.Element {
@@ -96,7 +94,7 @@ export class Tabs extends React.Component<ITabsProps, void> {
 
 export const StateTabs = connect((state:State.ApplicationState) => {
   return {
-    tabList: state.tabs.map((td:State.TabState):ITabProps => {
+    tabList: (state.tabs.map((td:State.TabState):ITabProps => {
       let editor:State.EditorState = state.editors.find((s:State.EditorState) => s.id === td.editorId);
 
       return {
@@ -111,8 +109,8 @@ export const StateTabs = connect((state:State.ApplicationState) => {
             rowBinaryLength: 16
           } as IHexIntegerColumnDataProps]} />
         )
-      };
-    }).toJS(),
+      } as ITabProps;
+    }).toJS()) as ITabProps[],
     currentTabId: state.currentTabId
   };
 }, {

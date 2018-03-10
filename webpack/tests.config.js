@@ -35,21 +35,22 @@ var webpack_common = require('./common');
 module.exports = {
   entry: entries,
   output: {
-    path: './build',
     filename: '[name].js',
-    libraryTarget: 'commonjs'
+    libraryTarget: 'commonjs',
+    path: path.join(__dirname, '../build'),
   },
   target: 'node',
+  mode: 'development',
   externals: [webpack_common.build_externals()],
   node: {
     __dirname: false,
     __filename: false
   },
   resolve: {
-    extensions: ['', '.webpack.js', '.ts', '.tsx', '.js']
+    extensions: ['.webpack.js', '.ts', '.tsx', '.js']
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.ts[x]?$/,
         loader: 'ts-loader'
